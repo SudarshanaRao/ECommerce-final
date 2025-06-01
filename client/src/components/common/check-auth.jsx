@@ -12,6 +12,9 @@ function CheckAuth({ children }) {
     pathname.includes("/login") ||
     pathname.includes("/register") ||
     pathname.includes("/auth/verify-otp");
+
+    console.log(isAuthenticated, user);
+    
     
 
     if (isAuthenticated && user?.isOtpVerified && pathname === "/auth/verify-otp") {

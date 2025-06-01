@@ -9,13 +9,14 @@ const ShoppingOrderDetailsView = ({ orderDetails }) => {
   const { user } = useSelector((state) => state.auth);
 
   const statusColors = {
-    confirmed: "bg-green-500",
+    confirmed: "bg-blue-500",
     rejected: "bg-rose-500",
     pending: "bg-yellow-400",
+    delivered: "bg-green-500",
   };
 
   return (
-    <DialogContent className="sm:max-w-[600px] p-6 bg-purple-100/50 backdrop-blur-md rounded-xl shadow-2xl border border-purple-200">
+    <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto p-8 bg-white bg-opacity-80 backdrop-blur-lg rounded-2xl shadow-lg border border-gray-300 dark:bg-gray-900 dark:bg-opacity-70 dark:border-gray-700">
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}

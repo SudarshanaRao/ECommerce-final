@@ -147,8 +147,8 @@ function ShoppingCheckout() {
         />
         <div className="flex flex-col gap-4">
           {cartItems?.items?.length > 0 &&
-            cartItems.items.map((item) => (
-              <UserCartItemsContent key={item._id} cartItem={item} />
+            cartItems.items.map((item, index) => (
+              <UserCartItemsContent key={item._id || index} cartItem={item} />
             ))}
           <div className="mt-8 space-y-4">
             <div className="flex justify-between">

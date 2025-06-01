@@ -53,7 +53,10 @@ export const getAllOrdersByUserId = createAsyncThunk(
       const response = await axios.get(
         `http://localhost:5000/api/shop/order/list/${userId}`
       );
+      
       return response.data.data;
+      
+      
     } catch (error) {
       console.error("Error fetching orders:", error.response || error.message);
       return rejectWithValue(error.response?.data || error.message);
@@ -111,7 +114,6 @@ const shoppingOrderSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(getAllOrdersByUserId.fulfilled, (state, action) => {
-        console.log("Orders loaded:", action.payload);
         state.isLoading = false;
         state.orderList = action.payload;
       })

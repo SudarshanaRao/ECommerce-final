@@ -27,6 +27,7 @@ import { addToCart, fetchCartItems } from "@/store/shop/cart-slice";
 import { useToast } from "@/components/ui/use-toast";
 import ProductDetailsDialog from "@/components/shopping-view/product-details";
 import { getFeatureImages } from "@/store/common-slice";
+import FinStoreLogo from "../../assets/finstore_logo.png";
 
 const categoriesWithIcon = [
   { id: "men", label: "Men", icon: ShirtIcon },
@@ -204,25 +205,34 @@ function ShoppingHome() {
         </div>
       </section>
 
-      <section className="py-12">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-8">
-            Feature Products
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {productList && productList.length > 0
-              ? productList.map((productItem, index) => (
+      <section
+          className="relative py-12 bg-white"
+          style={{
+            backgroundImage: `url(${FinStoreLogo})`,
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "center",
+            backgroundSize: "40%",
+            opacity: 1,
+          }}
+        >
+          <div className="absolute inset-0 opacity-5 pointer-events-none bg-center bg-no-repeat bg-contain"
+              style={{ backgroundImage: `url(${FinStoreLogo})` }}
+          />
+          <div className="relative container mx-auto px-4">
+            <h2 className="text-3xl font-bold text-center mb-8 text-purple-800">Feature Products</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {productList?.length > 0 &&
+                productList.map((productItem, index) => (
                   <ShoppingProductTile
                     key={productItem._id || index}
                     handleGetProductDetails={handleGetProductDetails}
                     product={productItem}
                     handleAddtoCart={handleAddtoCart}
                   />
-                ))
-              : null}
+                ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
       <ProductDetailsDialog
         open={openDetailsDialog}
         setOpen={setOpenDetailsDialog}

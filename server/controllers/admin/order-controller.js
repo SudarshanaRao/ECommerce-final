@@ -29,7 +29,6 @@ const getAllOrdersOfAllUsers = async (req, res) => {
 const getOrdersByUserId = async (req, res) => {
   try {
     const { userId } = req.params;
-    console.log("Fetching orders for userId:", userId);
 
     if (!userId) {
       return res.status(400).json({

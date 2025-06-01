@@ -144,6 +144,10 @@ const authSlice = createSlice({
       .addCase(checkAuth.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload.success ? action.payload.user : null;
+        state.user = {
+          ...state.user,
+          isOtpVerified: true,
+        }
         state.isAuthenticated = action.payload.success;
       })
       .addCase(checkAuth.rejected, (state) => {
@@ -155,14 +159,11 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;
-        state.isOtpVerified = false;
       })
       .addCase(verifyOtp.pending, (state) => {
-        console.log("Otp verification started");
         state.isLoading = true;
       })
       .addCase(verifyOtp.fulfilled, (state) => {
-        console.log("Otp verification successful");
         state.isLoading = false;
         state.user = {
           ...state.user,
@@ -172,7 +173,10 @@ const authSlice = createSlice({
       .addCase(verifyOtp.rejected, (state) => {
         console.log("Otp verification failed");
         state.isLoading = false;
-        state.isOtpVerified = false;
+        state.user = {
+          ...state.user,
+          isOtpVerified: false,
+        }
       });
   },
 });

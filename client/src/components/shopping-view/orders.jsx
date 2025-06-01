@@ -51,6 +51,7 @@ function ShoppingOrders() {
     confirmed: "bg-gradient-to-r from-purple-500 via-pink-500 to-indigo-500",
     rejected: "bg-red-500",
     pending: "bg-yellow-400 text-black",
+    delivered: "bg-green-500",
   };
 
   return (
