@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom";
 import { motion } from "framer-motion";
+import FinStoreLogo from '../../assets/finstore_logo_white.png'
 
 function AuthLayout() {
   return (
@@ -16,6 +17,7 @@ function AuthLayout() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
         >
+          <img src={FinStoreLogo} alt="FinStore Logo" className="h-48 pl-32" />
           <h1 className="text-5xl font-extrabold tracking-tight leading-tight">
             Welcome to <br />
             E-Commerce Shopping 🛒
@@ -33,7 +35,11 @@ function AuthLayout() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <Outlet />
+        <div className="absolute inset-0 bg-[url('/pattern.svg')] bg-repeat opacity-20 pointer-events-none z-0" />
+  
+        <div className="relative z-10">
+          <Outlet />
+        </div>
       </motion.div>
     </div>
   );
