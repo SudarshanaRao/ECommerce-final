@@ -109,12 +109,12 @@ const SibApiV3Sdk = require('sib-api-v3-sdk');
 // Configure Brevo API client
 const defaultClient = SibApiV3Sdk.ApiClient.instance;
 const apiKey = defaultClient.authentications['api-key'];
-apiKey.apiKey = process.env.BREVO_API_KEY // Replace with your actual API key
+apiKey.apiKey = process.env.BREVO_API_KEY 
 
 const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
 // Store OTPs temporarily
-const otpStore = {}; // You should place this outside of this function for persistence
+const otpStore = {}; 
 
 const sendOtp = async (req, res) => {
   const { email } = req.body;
@@ -132,7 +132,7 @@ const sendOtp = async (req, res) => {
   // Setup transactional email
   const sendSmtpEmail = {
     to: [{ email }],
-    templateId: 1, // Replace with your actual template ID
+    templateId: 1, 
     params: {
       OTP: generatedOtp
     },
@@ -141,7 +141,7 @@ const sendOtp = async (req, res) => {
     },
     sender: {
       name: "ECommerce",
-      email: "pandu.sudha2003@gmail.com" // This must be a verified sender in Brevo
+      email: "pandu.sudha2003@gmail.com" 
     }
   };
 
