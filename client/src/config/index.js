@@ -20,6 +20,13 @@ export const registerFormControls = [
     componentType: "input",
     type: "password",
   },
+  {
+    name: "mobile",
+    label: "Mobile Number",
+    placeholder: "Enter your mobile number",
+    componentType: "input",
+    type: "tel",
+  }
 ];
 
 export const loginFormControls = [

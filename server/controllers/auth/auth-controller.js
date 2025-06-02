@@ -5,7 +5,7 @@ require('dotenv').config();
 
 //register
 const registerUser = async (req, res) => {
-  const { userName, email, password, isOtpVerified } = req.body;
+  const { userName, email, password, isOtpVerified, mobile } = req.body;
 
   try {
     const checkUser = await User.findOne({ email });
@@ -19,6 +19,7 @@ const registerUser = async (req, res) => {
     const newUser = new User({
       userName,
       email,
+      mobile,
       password: hashPassword,
       isOtpVerified,
     });
@@ -64,6 +65,7 @@ const loginUser = async (req, res) => {
         id: checkUser._id,
         role: checkUser.role,
         email: checkUser.email,
+        mobile: checkUser.mobile,
         userName: checkUser.userName,
         isOtpVerified: checkUser.isOtpVerified,
       },
@@ -78,6 +80,7 @@ const loginUser = async (req, res) => {
         email: checkUser.email,
         role: checkUser.role,
         id: checkUser._id,
+        mobile: checkUser.mobile,
         userName: checkUser.userName,
         isOtpVerified: checkUser.isOtpVerified,
       },

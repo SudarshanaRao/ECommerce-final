@@ -11,6 +11,7 @@ const initialState = {
   userName: "",
   email: "",
   password: "",
+  mobile: "",
 };
 
 function AuthRegister() {
