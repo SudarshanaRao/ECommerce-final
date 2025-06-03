@@ -67,7 +67,7 @@ export const addProductFormElements = [
     options: [
       { id: "men", label: "Men" },
       { id: "women", label: "Women" },
-      { id: "kids", label: "Kids" },
+      { id: "skincare", label: "Skincare" },
       { id: "accessories", label: "Accessories" },
       { id: "footwear", label: "Footwear" },
     ],
@@ -83,6 +83,8 @@ export const addProductFormElements = [
       { id: "levi", label: "Levi's" },
       { id: "zara", label: "Zara" },
       { id: "h&m", label: "H&M" },
+      { id: "tonymoly", label: "TonyMoly" },
+      { id: "dermaco", label: "Dermaco" },
     ],
   },
   {
@@ -130,8 +132,8 @@ export const shoppingViewHeaderMenuItems = [
     path: "/shop/listing",
   },
   {
-    id: "kids",
-    label: "Kids",
+    id: "skincare",
+    label: "Skincare",
     path: "/shop/listing",
   },
   {
@@ -154,7 +156,7 @@ export const shoppingViewHeaderMenuItems = [
 export const categoryOptionsMap = {
   men: "Men",
   women: "Women",
-  kids: "Kids",
+  skincare: "Skincare",
   accessories: "Accessories",
   footwear: "Footwear",
 };
@@ -166,13 +168,15 @@ export const brandOptionsMap = {
   levi: "Levi",
   zara: "Zara",
   "h&m": "H&M",
+  tonymoly: "TonyMoly",
+  dermaco: "Dermaco",
 };
 
 export const filterOptions = {
   category: [
     { id: "men", label: "Men" },
     { id: "women", label: "Women" },
-    { id: "kids", label: "Kids" },
+    { id: "skincare", label: "Skincare" },
     { id: "accessories", label: "Accessories" },
     { id: "footwear", label: "Footwear" },
   ],
@@ -183,6 +187,8 @@ export const filterOptions = {
     { id: "levi", label: "Levi's" },
     { id: "zara", label: "Zara" },
     { id: "h&m", label: "H&M" },
+    { id: "tonymoly", label: "TonyMoly" },
+    { id: "dermaco", label: "Dermaco" },
   ],
 };
 

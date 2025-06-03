@@ -1,16 +1,16 @@
 import { Button } from "@/components/ui/button";
 import {
   Airplay,
-  BabyIcon,
+  Pipette,
   ChevronLeftIcon,
   ChevronRightIcon,
-  CloudLightning,
+  Sparkles,
   Heater,
   Images,
   Shirt,
   ShirtIcon,
   ShoppingBasket,
-  UmbrellaIcon,
+  Footprints,
   WashingMachine,
   WatchIcon,
 } from "lucide-react";
@@ -31,10 +31,10 @@ import FinStoreLogo from "../../assets/finstore_logo.png";
 
 const categoriesWithIcon = [
   { id: "men", label: "Men", icon: ShirtIcon },
-  { id: "women", label: "Women", icon: CloudLightning },
-  { id: "kids", label: "Kids", icon: BabyIcon },
+  { id: "women", label: "Women", icon: Sparkles },
+  { id: "skincare", label: "Skincare", icon: Pipette },
   { id: "accessories", label: "Accessories", icon: WatchIcon },
-  { id: "footwear", label: "Footwear", icon: UmbrellaIcon },
+  { id: "footwear", label: "Footwear", icon: Footprints },
 ];
 
 const brandsWithIcon = [
