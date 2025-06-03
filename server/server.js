@@ -32,7 +32,16 @@ const allowedOrigins = ["http://localhost:5173", "https://finstore-backend.dhars
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: function (origin, callback) {
+      // Allow requests with no origin (e.g., mobile apps or curl)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("Not allowed by CORS"));
+      }
+    },
     methods: ["GET", "POST", "DELETE", "PUT"],
     allowedHeaders: [
       "Content-Type",
@@ -44,6 +53,9 @@ app.use(
     credentials: true,
   })
 );
+
+app.options("*", cors());
+
 
 app.use(cookieParser());
 app.use(express.json());
