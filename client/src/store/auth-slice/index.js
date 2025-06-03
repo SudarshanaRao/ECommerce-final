@@ -89,7 +89,7 @@ export const checkAuth = createAsyncThunk(
 
   async () => {
     const response = await axios.get(
-      "http://localhost:5000/api/auth/check-auth",
+      "https://finstore-backend.dharsh.xyz/api/auth/check-auth",
       {
         withCredentials: true,
         headers: {
