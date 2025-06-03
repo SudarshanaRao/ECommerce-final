@@ -22,7 +22,7 @@ import { Badge } from "../ui/badge";
 
 function ShoppingOrders() {
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
-  const [selectedOrderId, setSelectedOrderId] = useState(null);
+  // const [selectedOrderId, setSelectedOrderId] = useState(null);
   const dispatch = useDispatch();
 
   const { user } = useSelector((state) => state.auth);
@@ -43,7 +43,7 @@ function ShoppingOrders() {
   }, [orderDetails]);
 
   function handleFetchOrderDetails(orderId) {
-    setSelectedOrderId(orderId);
+    // setSelectedOrderId(orderId);
     dispatch(getOrderDetails(orderId));
   }
 
@@ -136,7 +136,7 @@ function ShoppingOrders() {
           if (!open) {
             setOpenDetailsDialog(false);
             dispatch(resetOrderDetails());
-            setSelectedOrderId(null);
+            // setSelectedOrderId(null);
           }
         }}
       >

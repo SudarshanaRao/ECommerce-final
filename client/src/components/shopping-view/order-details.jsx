@@ -17,7 +17,7 @@ const ShoppingOrderDetailsView = ({ orderDetails }) => {
   };
 
   return (
-    <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto p-8 bg-white bg-opacity-80 backdrop-blur-lg rounded-2xl shadow-lg border border-gray-300 dark:bg-gray-900 dark:bg-opacity-70 dark:border-gray-700">
+    <DialogContent className="sm:max-w-[600px] h-[85vh] overflow-y-auto bg-white rounded-lg shadow-xl p-6 animate-fadeIn">
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
