@@ -12,6 +12,6 @@ const router = express.Router();
 router.get("/get", getAllOrdersOfAllUsers);
 router.get("/details/:id", getOrderDetailsForAdmin);
 router.put("/update/:id", updateOrderStatus);
-router.get("/list/:userId", getOrdersByUserId);
+router.get("/:userId", getOrdersByUserId);
 
 module.exports = router;
