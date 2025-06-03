@@ -31,7 +31,7 @@ const PORT = process.env.PORT || 5000;
 
 app.use(
   cors({
-    origin: "https://finstore.dharsh.xyz",
+    origin: "http://localhost:5173",
     methods: ["GET", "POST", "DELETE", "PUT"],
     allowedHeaders: [
       "Content-Type",
@@ -44,9 +44,7 @@ app.use(
   })
 );
 
-app.get("/", (req, res) => {
-  res.send("Hello from the server!");
-});
+
 
 
 
