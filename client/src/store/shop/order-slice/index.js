@@ -14,12 +14,10 @@ const initialState = {
 export const createNewOrder = createAsyncThunk(
   "order/createNewOrder",
   async (orderData) => {
-    
     const response = await axios.post(
       "http://localhost:5000/api/shop/order/create",
       orderData
     );
-    
 
     return {
       order: {
