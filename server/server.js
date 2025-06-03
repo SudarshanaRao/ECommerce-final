@@ -28,16 +28,10 @@ mongoose
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://finstore.dharsh.xyz",           // ✅ frontend domain
-  "https://finstore-backend.dharsh.xyz"    // ✅ backend domain (optional for admin/other internal tools)
-];
-
 
 app.use(
   cors({
-    origin: "https://finstore.dharsh.xyz",           // ✅ frontend domain
+    origin: "http://localhost:5173",
     methods: ["GET", "POST", "DELETE", "PUT"],
     allowedHeaders: [
       "Content-Type",
@@ -49,15 +43,6 @@ app.use(
     credentials: true,
   })
 );
-
-app.options("*", cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    return callback(new Error("Not allowed by CORS"));
-  },
-  credentials: true,
-}));
 
 
 
