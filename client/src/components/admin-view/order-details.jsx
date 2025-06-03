@@ -43,7 +43,7 @@ function AdminOrderDetailsView({ orderDetails }) {
   }
 
   return (
-    <DialogContent className="sm:max-w-[600px] bg-white rounded-lg shadow-xl p-6 animate-fadeIn">
+    <DialogContent className="sm:max-w-[600px] h-[85vh] overflow-y-auto bg-white rounded-lg shadow-xl p-6 animate-fadeIn">
       <div className="grid gap-2">
         {/* Order Basic Info */}
         <div className="grid gap-2 text-gray-800">
@@ -69,14 +69,20 @@ function AdminOrderDetailsView({ orderDetails }) {
             <Label>
               <Badge
                 className={`py-2 px-3 rounded-full text-white font-semibold transition-transform transform hover:scale-110 shadow-md ${
-                  orderDetails?.orderStatus === "confirmed"
+                  orderDetails?.orderStatus === "delivered"
                     ? "bg-green-600"
                     : orderDetails?.orderStatus === "rejected"
                     ? "bg-red-600"
-                    : "bg-gray-700"
+                    : orderDetails?.orderStatus === "pending"
+                    ? "bg-yellow-500"
+                    : orderDetails?.orderStatus === "inShipping"
+                    ? "bg-blue-600"
+                    : "bg-gray-500"
+
                 }`}
               >
-                {orderDetails?.orderStatus || "Unknown"}
+                {(orderDetails?.orderStatus || "Unknown").charAt(0).toUpperCase() + (orderDetails?.orderStatus || "Unknown").slice(1)}
+
               </Badge>
             </Label>
           </div>

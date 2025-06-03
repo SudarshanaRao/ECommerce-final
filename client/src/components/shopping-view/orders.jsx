@@ -52,6 +52,7 @@ function ShoppingOrders() {
     rejected: "bg-red-500",
     pending: "bg-yellow-400 text-black",
     delivered: "bg-green-500",
+    inShipping: "bg-blue-500",
   };
 
   return (

@@ -72,11 +72,15 @@ function AdminOrdersView() {
                   <TableCell>
                     <Badge
                       className={`py-1 px-3 text-white capitalize tracking-wide rounded-md shadow-sm ${
-                        orderItem?.orderStatus === "confirmed"
-                          ? "bg-green-500"
-                          : orderItem?.orderStatus === "rejected"
-                          ? "bg-red-600"
-                          : "bg-gray-700"
+                        orderItem?.orderStatus === "delivered"
+                        ? "bg-green-600"
+                        : orderItem?.orderStatus === "rejected"
+                        ? "bg-red-600"
+                        : orderItem?.orderStatus === "pending"
+                        ? "bg-yellow-500"
+                        : orderItem?.orderStatus === "inShipping"
+                        ? "bg-blue-600"
+                        : "bg-gray-500"
                       }`}
                     >
                       {orderItem?.orderStatus}

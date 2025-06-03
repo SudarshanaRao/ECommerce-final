@@ -9,10 +9,11 @@ const ShoppingOrderDetailsView = ({ orderDetails }) => {
   const { user } = useSelector((state) => state.auth);
 
   const statusColors = {
-    confirmed: "bg-blue-500",
+    confirmed: "bg-gradient-to-r from-purple-500 via-pink-500 to-indigo-500",
     rejected: "bg-rose-500",
     pending: "bg-yellow-400",
     delivered: "bg-green-500",
+    inShipping: "bg-blue-500",
   };
 
   return (
