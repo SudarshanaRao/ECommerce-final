@@ -1,19 +1,19 @@
 import { Button } from "@/components/ui/button";
 import {
-  Airplay,
   Pipette,
   ChevronLeftIcon,
   ChevronRightIcon,
   Sparkles,
-  Heater,
-  Images,
-  Shirt,
   ShirtIcon,
-  ShoppingBasket,
   Footprints,
-  WashingMachine,
   WatchIcon,
 } from "lucide-react";
+import ZaraLogo from '../../assets/zara-logo.png'
+import NikeLogo from '../../assets/nike_logo.png'
+import AdidasLogo from '../../assets/adidas_logo.png'
+import PumaLogo from '../../assets/puma_logo.png'
+import LevisLogo from '../../assets/levis_logo.png'
+import HMLogo from '../../assets/hm_logo.png'
 import { Card, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -38,12 +38,12 @@ const categoriesWithIcon = [
 ];
 
 const brandsWithIcon = [
-  { id: "nike", label: "Nike", icon: Shirt },
-  { id: "adidas", label: "Adidas", icon: WashingMachine },
-  { id: "puma", label: "Puma", icon: ShoppingBasket },
-  { id: "levi", label: "Levi's", icon: Airplay },
-  { id: "zara", label: "Zara", icon: Images },
-  { id: "h&m", label: "H&M", icon: Heater },
+  { id: "nike", label: "Nike", icon: NikeLogo },
+  { id: "adidas", label: "Adidas", icon: AdidasLogo },
+  { id: "puma", label: "Puma", icon: PumaLogo },
+  { id: "levi", label: "Levi's", icon: LevisLogo },
+  { id: "zara", label: "Zara", icon: ZaraLogo },
+  { id: "h&m", label: "H&M", icon: HMLogo },
 ];
 function ShoppingHome() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -196,7 +196,11 @@ function ShoppingHome() {
                 className="cursor-pointer hover:shadow-lg transition-shadow"
               >
                 <CardContent className="flex flex-col items-center justify-center p-6">
-                  <brandItem.icon className="w-12 h-12 mb-4 text-primary" />
+                  <img
+                    src={brandItem.icon}
+                    alt={brandItem.label}
+                    className="w-12 h-12 mb-4 object-contain rounded-xl"
+                  />
                   <span className="font-bold">{brandItem.label}</span>
                 </CardContent>
               </Card>
