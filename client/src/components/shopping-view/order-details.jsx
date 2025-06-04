@@ -5,7 +5,7 @@ import { Label } from "../ui/label";
 import { Separator } from "../ui/separator";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { CheckCircle, Truck, Package, Ban, Clock } from "lucide-react";
+import { CheckCircle, Truck, Package, Ban, Clock, RefreshCw } from "lucide-react";
 
 const ShoppingOrderDetailsView = ({ orderDetails }) => {
   const { user } = useSelector((state) => state.auth);
@@ -36,30 +36,38 @@ const ShoppingOrderDetailsView = ({ orderDetails }) => {
     switch (status) {
       case "pending":
         return {
-          icon: <Clock className="w-10 h-10 text-yellow-600 mb-2" />,
+          icon: <Clock className="w-10 h-10 text-yellow-600 mb-2 animate-spin" />,
           title: "⏳ We're confirming your order!",
           desc: "Please be patient as we process your request.",
           bg: "from-yellow-100 to-yellow-200 text-yellow-700",
         };
+      case "inProcess":
+        return {
+          icon: <RefreshCw className="w-10 h-10 text-blue-600 mb-2 animate-spin" />,
+          title: "🔄 Order in Process",
+          desc: "Your order is being prepared. Sit tight — we’ll notify you once it’s ready!",
+          bg: "from-blue-100 to-blue-200 text-blue-700",
+        };
+
       case "inShipping":
         return {
-          icon: <Truck className="w-10 h-10 text-blue-600 mb-2" />,
+          icon: <Truck className="w-10 h-10 text-blue-600 mb-2 animate-truck-drive" />,
           title: "🚚 Your order is on the way!",
           desc: "Hang tight! It’ll be at your doorstep soon.",
           bg: "from-blue-100 to-blue-200 text-blue-700",
         };
       case "delivered":
         return {
-          icon: <Package className="w-10 h-10 text-green-600 mb-2" />,
+          icon: <Package className="w-10 h-10 text-green-600 mb-2 animate-bounce" />,
           title: "🎉 Delivered Successfully!",
           desc: "Thanks for shopping with us. We hope you enjoy your order!",
           bg: "from-green-100 to-green-200 text-green-700",
         };
       case "rejected":
         return {
-          icon: <Ban className="w-10 h-10 text-red-600 mb-2" />,
+          icon: <Ban className="w-10 h-10 text-red-600 mb-2 animate-shake" />,
           title: "❌ Order Rejected",
-          desc: "Unfortunately, your order could not be processed.",
+          desc: "Unfortunately, your order could not be processed. A refund will be issued within 6 working days.",
           bg: "from-red-100 to-red-200 text-red-700",
         };
       default:
