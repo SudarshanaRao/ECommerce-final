@@ -1,4 +1,4 @@
-import { StarIcon } from "lucide-react";
+import { Heart, HeartOff } from "lucide-react";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent } from "../ui/dialog";
@@ -12,65 +12,86 @@ import { Label } from "../ui/label";
 import StarRatingComponent from "../common/star-rating";
 import { useEffect, useState } from "react";
 import { addReview, getReviews } from "@/store/shop/review-slice";
+import { addWishlistItem, removeWishlistItem } from "@/utils/wishlist-utils";
 
 function ProductDetailsDialog({ open, setOpen, productDetails }) {
   const [reviewMsg, setReviewMsg] = useState("");
   const [rating, setRating] = useState(0);
+  const [isWishlisted, setIsWishlisted] = useState(false);
+
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const { cartItems } = useSelector((state) => state.shopCart);
   const { reviews } = useSelector((state) => state.shopReview);
-
   const { toast } = useToast();
 
-  function handleRatingChange(getRating) {
+  useEffect(() => {
+  if (!productDetails?._id) return;
+  
+  try {
+    const wishlist = JSON.parse(localStorage.getItem("wishlist_items") || "[]");
+    const exists = wishlist.some((item) => item.productId === productDetails._id);
+    setIsWishlisted(exists);
+  } catch (err) {
+    console.error("Failed to parse wishlist:", err);
+    setIsWishlisted(false);
+  }
+}, [productDetails?._id]);
 
-    setRating(getRating);
+
+
+  function handleRatingChange(newRating) {
+    setRating(newRating);
   }
 
-  function handleAddToCart(getCurrentProductId, getTotalStock) {
-    let getCartItems = cartItems.items || [];
+  const toggleWishlist = () => {
+    if (!productDetails?._id) return;
+    if (isWishlisted) {
+      removeWishlistItem(productDetails._id);
+      toast({ description: "Removed from wishlist" });
+    } else {
+      addWishlistItem({ productId: productDetails._id, ...productDetails });
+      toast({ description: "Added to wishlist" });
+    }
+    setIsWishlisted(!isWishlisted);
+  };
 
-    if (getCartItems.length) {
-      const indexOfCurrentItem = getCartItems.findIndex(
-        (item) => item.productId === getCurrentProductId
-      );
-      if (indexOfCurrentItem > -1) {
-        const getQuantity = getCartItems[indexOfCurrentItem].quantity;
-        if (getQuantity + 1 > getTotalStock) {
-          toast({
-            title: `Only ${getQuantity} quantity can be added for this item`,
-            variant: "destructive",
-          });
+  function handleAddToCart(productId, totalStock) {
+    if (!productId) return;
 
-          return;
+    const currentCartItems = cartItems?.items || [];
+    const existingItem = currentCartItems.find(
+      (item) => item.productId === productId
+    );
+
+    if (existingItem && existingItem.quantity + 1 > totalStock) {
+      toast({
+        title: `Only ${existingItem.quantity} quantity can be added for this item`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    dispatch(addToCart({ userId: user?.id, productId, quantity: 1 })).then(
+      (data) => {
+        if (data?.payload?.success) {
+          dispatch(fetchCartItems(user?.id));
+          toast({ title: "Product is added to cart" });
         }
       }
-    }
-    dispatch(
-      addToCart({
-        userId: user?.id,
-        productId: getCurrentProductId,
-        quantity: 1,
-      })
-    ).then((data) => {
-      if (data?.payload?.success) {
-        dispatch(fetchCartItems(user?.id));
-        toast({
-          title: "Product is added to cart",
-        });
-      }
-    });
+    );
   }
 
   function handleDialogClose() {
     setOpen(false);
-    dispatch(setProductDetails());
+    dispatch(setProductDetails(null));
     setRating(0);
     setReviewMsg("");
   }
 
   function handleAddReview() {
+    if (!rating || reviewMsg.trim() === "") return;
+
     dispatch(
       addReview({
         productId: productDetails?._id,
@@ -84,22 +105,14 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
         setRating(0);
         setReviewMsg("");
         dispatch(getReviews(productDetails?._id));
-        toast({
-          title: "Review added successfully!",
-        });
+        toast({ title: "Review added successfully!" });
       }
     });
   }
 
-  useEffect(() => {
-    if (productDetails !== null) dispatch(getReviews(productDetails?._id));
-  }, [productDetails]);
-
-
   const averageReview =
     reviews && reviews.length > 0
-      ? reviews.reduce((sum, reviewItem) => sum + reviewItem.reviewValue, 0) /
-        reviews.length
+      ? reviews.reduce((sum, r) => sum + r.reviewValue, 0) / reviews.length
       : 0;
 
   return (
@@ -108,19 +121,20 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
         <div className="relative overflow-hidden rounded-lg">
           <img
             src={productDetails?.image}
-            alt={productDetails?.title}
+            alt={productDetails?.title || "Product Image"}
             width={600}
             height={600}
             className="aspect-square w-full object-cover"
           />
         </div>
-        <div className="">
+        <div>
           <div>
             <h1 className="text-2xl font-extrabold">{productDetails?.title}</h1>
             <p className="text-muted-foreground text-l mb-5 mt-4">
               {productDetails?.description}
             </p>
           </div>
+
           <div className="flex items-center justify-between">
             <p
               className={`text-3xl font-bold text-primary ${
@@ -129,40 +143,59 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
             >
               ₹{productDetails?.price}
             </p>
-            {productDetails?.salePrice > 0 ? (
+            {productDetails?.salePrice > 0 && (
               <p className="text-2xl font-bold text-muted-foreground">
                 ₹{productDetails?.salePrice}
               </p>
-            ) : null}
+            )}
           </div>
+
           <div className="flex items-center gap-2 mt-2">
-            <div className="flex items-center gap-0.5">
-              <StarRatingComponent rating={averageReview} />
-            </div>
-            <span className="text-muted-foreground">
-              ({averageReview.toFixed(2)})
-            </span>
+            <StarRatingComponent rating={averageReview} />
+            <span className="text-muted-foreground">({averageReview.toFixed(2)})</span>
           </div>
+
           <div className="mt-5 mb-5">
             {productDetails?.totalStock === 0 ? (
-              <Button className="w-full opacity-60 cursor-not-allowed">
+              <Button className="w-full opacity-60 cursor-not-allowed" disabled>
                 Out of Stock
               </Button>
             ) : (
               <Button
                 className="w-full"
                 onClick={() =>
-                  handleAddToCart(
-                    productDetails?._id,
-                    productDetails?.totalStock
-                  )
+                  handleAddToCart(productDetails?._id, productDetails?.totalStock)
                 }
               >
                 Add to Cart
               </Button>
             )}
+
+            <Button
+              onClick={toggleWishlist}
+              variant={isWishlisted ? "secondary" : "outline"}
+              className={`w-full mt-4 flex items-center gap-2 transition-colors ${
+                isWishlisted
+                  ? "bg-purple-100 text-purple-700 hover:bg-purple-200"
+                  : "hover:bg-purple-50"
+              }`}
+            >
+              {isWishlisted ? (
+                <>
+                  <HeartOff className="w-5 h-5" />
+                  <span>Remove from Wishlist</span>
+                </>
+              ) : (
+                <>
+                  <Heart className="w-5 h-5" />
+                  <span>Add to Wishlist</span>
+                </>
+              )}
+            </Button>
           </div>
+
           <Separator />
+
           <div className="max-h-[300px] overflow-auto">
             <h2 className="text-xl font-bold mb-4">Reviews</h2>
             <div className="grid gap-6">
@@ -171,7 +204,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                   <div key={reviewItem._id || index} className="flex gap-4">
                     <Avatar className="w-10 h-10 border">
                       <AvatarFallback>
-                        {reviewItem?.userName[0].toUpperCase()}
+                        {reviewItem?.userName?.[0]?.toUpperCase() || "U"}
                       </AvatarFallback>
                     </Avatar>
                     <div className="grid gap-1">
@@ -179,11 +212,9 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                         <h3 className="font-bold">{reviewItem?.userName}</h3>
                       </div>
                       <div className="flex items-center gap-0.5">
-                        <StarRatingComponent rating={reviewItem?.reviewValue} />
+                        <StarRatingComponent rating={reviewItem?.reviewValue || 0} />
                       </div>
-                      <p className="text-muted-foreground">
-                        {reviewItem.reviewMessage}
-                      </p>
+                      <p className="text-muted-foreground">{reviewItem.reviewMessage}</p>
                     </div>
                   </div>
                 ))
@@ -191,24 +222,17 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                 <h1>No Reviews</h1>
               )}
             </div>
-            <div className="mt-10 flex-col flex gap-2">
+
+            <div className="mt-10 flex flex-col gap-2">
               <Label>Write a review</Label>
-              <div className="flex gap-1">
-                <StarRatingComponent
-                  rating={rating}
-                  handleRatingChange={handleRatingChange}
-                />
-              </div>
+              <StarRatingComponent rating={rating} handleRatingChange={handleRatingChange} />
               <Input
                 name="reviewMsg"
                 value={reviewMsg}
-                onChange={(event) => setReviewMsg(event.target.value)}
+                onChange={(e) => setReviewMsg(e.target.value)}
                 placeholder="Write a review..."
               />
-              <Button
-                onClick={handleAddReview}
-                disabled={reviewMsg.trim() === ""}
-              >
+              <Button onClick={handleAddReview} disabled={!rating || reviewMsg.trim() === ""}>
                 Submit
               </Button>
             </div>

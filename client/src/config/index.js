@@ -85,6 +85,7 @@ export const addProductFormElements = [
       { id: "h&m", label: "H&M" },
       { id: "tonymoly", label: "TonyMoly" },
       { id: "dermaco", label: "Dermaco" },
+      { id: "minimalist", label: "Minimalist" },
     ],
   },
   {
@@ -170,6 +171,7 @@ export const brandOptionsMap = {
   "h&m": "H&M",
   tonymoly: "TonyMoly",
   dermaco: "Dermaco",
+  minimalist: "Minimalist",
 };
 
 export const filterOptions = {
@@ -189,6 +191,7 @@ export const filterOptions = {
     { id: "h&m", label: "H&M" },
     { id: "tonymoly", label: "TonyMoly" },
     { id: "dermaco", label: "Dermaco" },
+    { id: "minimalist", label: "Minimalist" },
   ],
 };
 

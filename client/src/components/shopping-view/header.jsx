@@ -24,6 +24,8 @@ import { useEffect, useState } from "react";
 import { fetchCartItems } from "@/store/shop/cart-slice";
 import { Label } from "../ui/label";
 import FinStoreLogo from '../../assets/finstore_logo.png'
+import UserWishlistWrapper from "./wishlist-wrapper";
+import { getWishlistItems } from "@/utils/wishlist-utils";
 
 function MenuItems() {
   const navigate = useNavigate();
@@ -72,8 +74,16 @@ function HeaderRightContent() {
   const { user } = useSelector((state) => state.auth);
   const { cartItems } = useSelector((state) => state.shopCart);
   const [openCartSheet, setOpenCartSheet] = useState(false);
+  const [openWishlistSheet, setOpenWishlistSheet] = useState(false);
+  const [wishlistItems, setWishlistItems] = useState([]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  useEffect(() => {
+  const items = getWishlistItems();
+  setWishlistItems(items);
+  
+}, [openWishlistSheet]);
 
   function handleLogout() {
     dispatch(logoutUser());
@@ -87,16 +97,21 @@ function HeaderRightContent() {
 
   return (
     <div className="flex flex-col lg:flex-row items-center gap-4">
-      {/* Wishlist Button */}
-      <Button
-        onClick={() => navigate("/shop/wishlist")}
-        variant="outline"
-        size="icon"
-        className="relative hover:bg-purple-50 transition-colors"
-        aria-label="User wishlist"
-      >
-        <Heart className="w-6 h-6 text-gray-700" />
-      </Button>
+      {/* Wishlist Sheet */}
+      <Sheet open={openWishlistSheet} onOpenChange={setOpenWishlistSheet}>
+        <Button
+          onClick={() => setOpenWishlistSheet(true)}
+          variant="outline"
+          size="icon"
+          className="relative hover:bg-purple-50 transition-colors"
+          aria-label="User wishlist"
+        >
+          <Heart className="w-6 h-6 text-gray-700" />
+        </Button>
+        <UserWishlistWrapper
+          setOpenWishlistSheet={setOpenWishlistSheet}
+        />
+      </Sheet>
 
       {/* Cart Sheet */}
       <Sheet open={openCartSheet} onOpenChange={setOpenCartSheet}>

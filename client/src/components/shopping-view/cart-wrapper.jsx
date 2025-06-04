@@ -32,17 +32,13 @@ function UserCartWrapper({ cartItems, setOpenCartSheet }) {
       }`}
     >
       <SheetHeader
-        className={`bg-gray-800 p-4 mt-5 rounded-md mb-6 shadow-md ${
-          animateIn ? "animate-border-fade" : ""
-        }`}
-        style={{
-          border: "1px solid rgba(128, 90, 220, 0.4)",
-        }}
+        className="bg-gray-900 p-4 mt-5 rounded-md mb-6 shadow-md border border-purple-400"
       >
-        <SheetTitle className="text-3xl font-extrabold tracking-wide text-purple-400 animate-pulse-soft">
+        <SheetTitle className="text-3xl font-bold tracking-wide text-purple-200">
           Your Cart
         </SheetTitle>
       </SheetHeader>
+
 
       <div className="space-y-6 max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-purple-400 scrollbar-track-gray-100">
         {cartItems && cartItems.length > 0 ? (
