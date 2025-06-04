@@ -1,4 +1,4 @@
-import { HousePlug, LogOut, Menu, ShoppingCart, UserCog } from "lucide-react";
+import { Heart, LogOut, Menu, ShoppingCart, UserCog } from "lucide-react";
 import {
   Link,
   useLocation,
@@ -87,6 +87,18 @@ function HeaderRightContent() {
 
   return (
     <div className="flex flex-col lg:flex-row items-center gap-4">
+      {/* Wishlist Button */}
+      <Button
+        onClick={() => navigate("/shop/wishlist")}
+        variant="outline"
+        size="icon"
+        className="relative hover:bg-purple-50 transition-colors"
+        aria-label="User wishlist"
+      >
+        <Heart className="w-6 h-6 text-gray-700" />
+      </Button>
+
+      {/* Cart Sheet */}
       <Sheet open={openCartSheet} onOpenChange={setOpenCartSheet}>
         <Button
           onClick={() => setOpenCartSheet(true)}
@@ -109,6 +121,7 @@ function HeaderRightContent() {
         />
       </Sheet>
 
+      {/* Profile Dropdown */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Avatar className="bg-purple-700 cursor-pointer hover:bg-purple-800 transition-colors">
@@ -142,6 +155,7 @@ function HeaderRightContent() {
     </div>
   );
 }
+
 
 function ShoppingHeader() {
   const { isAuthenticated } = useSelector((state) => state.auth);

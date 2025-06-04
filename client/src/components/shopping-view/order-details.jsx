@@ -15,6 +15,7 @@ const ShoppingOrderDetailsView = ({ orderDetails }) => {
 
   const statusColors = {
     confirmed: "bg-gradient-to-r from-purple-500 via-pink-500 to-indigo-500",
+    inProcess: "bg-pink-500",
     rejected: "bg-rose-500",
     pending: "bg-yellow-400",
     delivered: "bg-green-500",
@@ -23,6 +24,7 @@ const ShoppingOrderDetailsView = ({ orderDetails }) => {
 
   const trackingSteps = [
     { status: "confirmed", label: "Order Confirmed", icon: <CheckCircle className="text-purple-600" /> },
+    { status: "inProcess", label: "In Process", icon: <Clock className="text-pink-600" />},
     { status: "inShipping", label: "In Shipping", icon: <Truck className="text-blue-600" /> },
     { status: "delivered", label: "Delivered", icon: <Package className="text-green-600" /> },
     { status: "rejected", label: "Order Rejected", icon: <Ban className="text-rose-600" /> },

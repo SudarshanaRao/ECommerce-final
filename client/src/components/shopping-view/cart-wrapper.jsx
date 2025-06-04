@@ -32,13 +32,14 @@ function UserCartWrapper({ cartItems, setOpenCartSheet }) {
       }`}
     >
       <SheetHeader
-        className="bg-gray-800 p-4 mt-5 rounded-md mb-6 shadow-md"
+        className={`bg-gray-800 p-4 mt-5 rounded-md mb-6 shadow-md ${
+          animateIn ? "animate-border-fade" : ""
+        }`}
         style={{
           border: "1px solid rgba(128, 90, 220, 0.4)",
-          animation: animateIn ? "fadeInBorder 1s ease forwards" : "none",
         }}
       >
-        <SheetTitle className="text-3xl font-extrabold tracking-wide text-purple-400 transition-colors duration-1000 animate-pulse-soft">
+        <SheetTitle className="text-3xl font-extrabold tracking-wide text-purple-400 animate-pulse-soft">
           Your Cart
         </SheetTitle>
       </SheetHeader>
@@ -48,8 +49,7 @@ function UserCartWrapper({ cartItems, setOpenCartSheet }) {
           cartItems.map((item) => (
             <div
               key={item.productId}
-              className="animate-fadeInUp"
-              style={{ animationDuration: "0.5s", animationFillMode: "forwards" }}
+              className="animate-fade-in-up"
             >
               <UserCartItemsContent cartItem={item} />
             </div>
@@ -73,56 +73,16 @@ function UserCartWrapper({ cartItems, setOpenCartSheet }) {
           navigate("/shop/checkout");
           setOpenCartSheet(false);
         }}
-        className="w-full mt-6 bg-purple-600 hover:bg-purple-700 focus:ring-purple-500 text-white font-semibold py-3 rounded-lg shadow-md transition-transform duration-150 active:scale-95"
+        className="w-full mt-6 bg-purple-600 hover:bg-purple-700 focus:ring-purple-500 text-white font-semibold py-3 rounded-lg shadow-md transition-transform duration-150 active:scale-95 border border-purple-500"
         disabled={cartItems.length === 0}
         style={{
           boxShadow: animateIn
             ? "0 4px 12px rgba(128, 90, 220, 0.5)"
             : "none",
-          border: "1px solid rgba(128, 90, 220, 0.6)",
         }}
       >
         Checkout
       </Button>
-
-      <style jsx>{`
-        @keyframes fadeInUp {
-          0% {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          100% {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fadeInUp {
-          animation-name: fadeInUp;
-        }
-
-        @keyframes fadeInBorder {
-          from {
-            border-color: transparent;
-          }
-          to {
-            border-color: rgba(128, 90, 220, 0.4);
-          }
-        }
-
-        @keyframes pulseSoft {
-          0%, 100% {
-            color: #9f7aea;
-            text-shadow: 0 0 4px rgba(159, 122, 234, 0.8);
-          }
-          50% {
-            color: #a78bfa;
-            text-shadow: 0 0 8px rgba(167, 139, 250, 1);
-          }
-        }
-        .animate-pulse-soft {
-          animation: pulseSoft 3s ease-in-out infinite;
-        }
-      `}</style>
     </SheetContent>
   );
 }

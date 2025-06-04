@@ -67,3 +67,45 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  @keyframes fadeInUp {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-fade-in-up {
+    animation: fadeInUp 0.5s forwards;
+  }
+
+  @keyframes fadeInBorder {
+    from {
+      border-color: transparent;
+    }
+    to {
+      border-color: rgba(128, 90, 220, 0.4);
+    }
+  }
+  .animate-border-fade {
+    animation: fadeInBorder 1s ease forwards;
+  }
+
+  @keyframes pulseSoft {
+    0%, 100% {
+      color: #9f7aea;
+      text-shadow: 0 0 4px rgba(159, 122, 234, 0.8);
+    }
+    50% {
+      color: #a78bfa;
+      text-shadow: 0 0 8px rgba(167, 139, 250, 1);
+    }
+  }
+  .animate-pulse-soft {
+    animation: pulseSoft 3s ease-in-out infinite;
+  }
+}

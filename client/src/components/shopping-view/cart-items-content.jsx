@@ -7,13 +7,19 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 
 function UserCartItemsContent({ cartItem }) {
+  const dispatch = useDispatch();
+  const { toast } = useToast();
+
   const { user } = useSelector((state) => state.auth);
   const { cartItems } = useSelector((state) => state.shopCart);
   const { productList } = useSelector((state) => state.shopProducts);
-  const dispatch = useDispatch();
-  const { toast } = useToast();
+
   const [removing, setRemoving] = useState(false);
   const [priceChanged, setPriceChanged] = useState(false);
+
+  const getCartItems = cartItems.items || [];
+  const product = productList.find((p) => p._id === cartItem?.productId);
+  const price = cartItem?.salePrice > 0 ? cartItem?.salePrice : cartItem?.price;
 
   // Animate price change
   useEffect(() => {
@@ -22,64 +28,43 @@ function UserCartItemsContent({ cartItem }) {
     return () => clearTimeout(timer);
   }, [cartItem.quantity]);
 
-  function handleUpdateQuantity(getCartItem, typeOfAction) {
-    if (typeOfAction === "plus") {
-      const getCartItems = cartItems.items || [];
+  function handleUpdateQuantity(item, action) {
+    if (action === "plus") {
+      const cartItemIndex = getCartItems.findIndex((i) => i.productId === item?.productId);
+      const currentQuantity = getCartItems[cartItemIndex]?.quantity || 0;
+      const totalStock = product?.totalStock || 0;
 
-      if (getCartItems.length) {
-        const indexOfCurrentCartItem = getCartItems.findIndex(
-          (item) => item.productId === getCartItem?.productId
-        );
-
-        const productIndex = productList.findIndex(
-          (product) => product._id === getCartItem?.productId
-        );
-        const totalStock = productList[productIndex]?.totalStock || 0;
-
-        if (indexOfCurrentCartItem > -1) {
-          const currentQuantity = getCartItems[indexOfCurrentCartItem].quantity;
-          if (currentQuantity + 1 > totalStock) {
-            toast({
-              title: `Only ${currentQuantity} quantity can be added for this item`,
-              variant: "destructive",
-            });
-            return;
-          }
-        }
+      if (currentQuantity + 1 > totalStock) {
+        toast({
+          title: `Only ${currentQuantity} quantity can be added for this item`,
+          variant: "destructive",
+        });
+        return;
       }
     }
 
     dispatch(
       updateCartQuantity({
         userId: user?.id,
-        productId: getCartItem?.productId,
-        quantity:
-          typeOfAction === "plus"
-            ? getCartItem?.quantity + 1
-            : getCartItem?.quantity - 1,
+        productId: item?.productId,
+        quantity: action === "plus" ? item.quantity + 1 : item.quantity - 1,
       })
     ).then((data) => {
       if (data?.payload?.success) {
-        toast({
-          title: "Cart item updated successfully",
-        });
+        toast({ title: "Cart item updated successfully" });
       }
     });
   }
 
-  function handleCartItemDelete(getCartItem) {
-    setRemoving(true); // start animation
+  function handleCartItemDelete(item) {
+    setRemoving(true);
     setTimeout(() => {
-      dispatch(
-        deleteCartItem({ userId: user?.id, productId: getCartItem?.productId })
-      ).then((data) => {
+      dispatch(deleteCartItem({ userId: user?.id, productId: item?.productId })).then((data) => {
         if (data?.payload?.success) {
-          toast({
-            title: "Cart item deleted successfully",
-          });
+          toast({ title: "Cart item deleted successfully" });
         }
       });
-    }, 400); // wait for exit animation
+    }, 400);
   }
 
   return (
@@ -103,33 +88,33 @@ function UserCartItemsContent({ cartItem }) {
             <h3 className="font-extrabold text-lg">{cartItem?.title}</h3>
             <div className="flex items-center gap-3 mt-2">
               <Button
+                as={motion.button}
                 variant="outline"
                 className="h-8 w-8 rounded-full"
                 size="icon"
-                disabled={cartItem?.quantity === 1}
+                disabled={cartItem.quantity === 1}
                 onClick={() => handleUpdateQuantity(cartItem, "minus")}
                 whileTap={{ scale: 0.8, backgroundColor: "#f87171", color: "white" }}
-                as={motion.button}
               >
                 <Minus className="w-4 h-4" />
                 <span className="sr-only">Decrease quantity</span>
               </Button>
               <motion.span
-                key={cartItem?.quantity}
+                key={cartItem.quantity}
                 initial={{ scale: 0.8, color: "#2563eb" }}
                 animate={{ scale: 1, color: "#1e40af" }}
                 transition={{ type: "spring", stiffness: 300 }}
                 className="font-semibold text-xl"
               >
-                {cartItem?.quantity}
+                {cartItem.quantity}
               </motion.span>
               <Button
+                as={motion.button}
                 variant="outline"
                 className="h-8 w-8 rounded-full"
                 size="icon"
                 onClick={() => handleUpdateQuantity(cartItem, "plus")}
                 whileTap={{ scale: 0.8, backgroundColor: "#34d399", color: "white" }}
-                as={motion.button}
               >
                 <Plus className="w-4 h-4" />
                 <span className="sr-only">Increase quantity</span>
@@ -138,23 +123,26 @@ function UserCartItemsContent({ cartItem }) {
           </div>
           <div className="flex flex-col items-end">
             <motion.p
-              key={cartItem?.quantity}
+              key={cartItem.quantity}
               initial={{ scale: 0.9, color: "#ef4444" }}
-              animate={priceChanged ? { scale: 1.1, color: "#22c55e" } : { scale: 1, color: "black" }}
+              animate={
+                priceChanged
+                  ? { scale: 1.1, color: "#22c55e" }
+                  : { scale: 1, color: "black" }
+              }
               transition={{ duration: 0.3 }}
               className="font-semibold text-lg"
             >
-              ₹
-              {(
-                (cartItem?.salePrice > 0 ? cartItem?.salePrice : cartItem?.price) *
-                cartItem?.quantity
-              ).toFixed(2)}
+              ₹{(price * cartItem.quantity).toFixed(2)}
             </motion.p>
             <motion.div
               whileHover={{ scale: 1.3, color: "#ef4444" }}
               whileTap={{ scale: 0.9, color: "#b91c1c" }}
               onClick={() => handleCartItemDelete(cartItem)}
               className="cursor-pointer mt-1"
+              role="button"
+              aria-label="Delete cart item"
+              tabIndex={0}
             >
               <Trash size={20} />
             </motion.div>
