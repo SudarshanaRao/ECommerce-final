@@ -5,7 +5,7 @@ import { Label } from "../ui/label";
 import { Separator } from "../ui/separator";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { CheckCircle, Truck, Package, Ban } from "lucide-react";
+import { CheckCircle, Truck, Package, Ban, Clock } from "lucide-react";
 
 const ShoppingOrderDetailsView = ({ orderDetails }) => {
   const { user } = useSelector((state) => state.auth);
@@ -29,6 +29,43 @@ const ShoppingOrderDetailsView = ({ orderDetails }) => {
   ];
 
   const currentStatusIndex = trackingSteps.findIndex((step) => step.status === orderDetails?.orderStatus);
+
+  const getStatusMessage = (status) => {
+    switch (status) {
+      case "pending":
+        return {
+          icon: <Clock className="w-10 h-10 text-yellow-600 mb-2" />,
+          title: "⏳ We're confirming your order!",
+          desc: "Please be patient as we process your request.",
+          bg: "from-yellow-100 to-yellow-200 text-yellow-700",
+        };
+      case "inShipping":
+        return {
+          icon: <Truck className="w-10 h-10 text-blue-600 mb-2" />,
+          title: "🚚 Your order is on the way!",
+          desc: "Hang tight! It’ll be at your doorstep soon.",
+          bg: "from-blue-100 to-blue-200 text-blue-700",
+        };
+      case "delivered":
+        return {
+          icon: <Package className="w-10 h-10 text-green-600 mb-2" />,
+          title: "🎉 Delivered Successfully!",
+          desc: "Thanks for shopping with us. We hope you enjoy your order!",
+          bg: "from-green-100 to-green-200 text-green-700",
+        };
+      case "rejected":
+        return {
+          icon: <Ban className="w-10 h-10 text-red-600 mb-2" />,
+          title: "❌ Order Rejected",
+          desc: "Unfortunately, your order could not be processed.",
+          bg: "from-red-100 to-red-200 text-red-700",
+        };
+      default:
+        return null;
+    }
+  };
+
+  const statusMsg = getStatusMessage(orderDetails?.orderStatus);
 
 
   return (
@@ -172,7 +209,7 @@ const ShoppingOrderDetailsView = ({ orderDetails }) => {
               )
               .map((step, index) => {
                 const isActive = step.status === orderDetails?.orderStatus;
-                const isCompleted = isDelivered || index < currentStatusIndex;
+                const isCompleted = index < currentStatusIndex || orderDetails?.orderStatus === "delivered";
 
                 return (
                   <motion.div
@@ -186,13 +223,13 @@ const ShoppingOrderDetailsView = ({ orderDetails }) => {
                     <div className="absolute -left-[34px] top-1">
                       <div
                         className={`w-7 h-7 flex items-center justify-center rounded-full border-4 
-                        ${
-                          isCompleted
-                            ? "border-green-500 bg-green-100"
-                            : isActive
-                            ? "border-purple-500 bg-white animate-pulse shadow-md"
-                            : "border-gray-300 bg-gray-100"
-                        }`}
+                          ${
+                            isCompleted
+                              ? "border-green-500 bg-green-100"
+                              : isActive
+                              ? "border-purple-500 bg-white animate-pulse shadow-md"
+                              : "border-gray-300 bg-gray-100"
+                          }`}
                       >
                         <span
                           className={`${
@@ -242,21 +279,17 @@ const ShoppingOrderDetailsView = ({ orderDetails }) => {
               })}
           </motion.div>
 
-          {/* Right Side Message (if delivered) */}
-          {isDelivered && (
+          {/* Right Side Excitement Message */}
+          {statusMsg && (
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
-              className="flex flex-col items-center justify-center text-center p-6 rounded-xl bg-gradient-to-br from-green-100 to-green-200 shadow-inner"
+              className={`flex flex-col items-center justify-center text-center p-6 rounded-xl bg-gradient-to-br ${statusMsg.bg} shadow-inner`}
             >
-              <Package className="w-12 h-12 text-green-600 mb-3" />
-              <h3 className="text-xl font-semibold text-green-700 mb-1">
-                🎉 Delivered Successfully!
-              </h3>
-              <p className="text-green-600 text-sm">
-                Your order has reached its destination. Thank you for shopping with us!
-              </p>
+              {statusMsg.icon}
+              <h3 className="text-xl font-semibold mb-2">{statusMsg.title}</h3>
+              <p className="text-sm">{statusMsg.desc}</p>
             </motion.div>
           )}
         </div>
