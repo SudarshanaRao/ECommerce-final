@@ -50,6 +50,12 @@ app.use(cors({
   credentials: true
 }));
 
+app.use((req, res, next) => {
+  console.log("Request Origin:", req.headers.origin);
+  next();
+});
+
+
 app.get("/", (req, res) => {
   res.send("Welcome to the E-Commerce API!");
 });
