@@ -109,7 +109,7 @@ const SibApiV3Sdk = require('sib-api-v3-sdk');
 // Configure Brevo API client
 const defaultClient = SibApiV3Sdk.ApiClient.instance;
 const apiKey = defaultClient.authentications['api-key'];
-apiKey.apiKey = process.env.BREVO_API_KEY 
+apiKey.apiKey = process.env.BREVO_API_KEY || "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"
 
 const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
@@ -140,7 +140,7 @@ const sendOtp = async (req, res) => {
       'X-Mailin-custom': 'OTP delivery'
     },
     sender: {
-      name: "ECommerce",
+      name: "FinStore",
       email: "pandu.sudha2003@gmail.com" 
     }
   };

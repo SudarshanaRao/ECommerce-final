@@ -21,8 +21,10 @@ const commonFeatureRouter = require("./routes/common/feature-routes");
 //create a database connection -> u can also
 //create a separate file for this and then import/use that file here
 
+const mongoURI = process.env.MONGO_URI || "mongodb+srv://Finstore:Admin123@cluster2003.zwiay.mongodb.net/?retryWrites=true&w=majority&appName=Cluster2003";
+
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(mongoURI)
   .then(() => console.log("Atlas MongoDB connected"))
   .catch((error) => console.log(error));
 
