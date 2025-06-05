@@ -31,15 +31,24 @@ mongoose
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// const allowedOrigins = [
-//   "http://localhost:3000",
-//   "https://finstore.dharsh.xyz",
-//   "https://ecommerce-frontend-blush-one.vercel.app",
-//   "https://ecommerce-frontend-git-main-sudarshanaraos-projects.vercel.app",
-//   "https://ecommerce-frontend-sudarshanaraos-projects.vercel.app"
-// ];
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://finstore.dharsh.xyz",
+  "https://ecommerce-frontend-blush-one.vercel.app",
+  "https://ecommerce-frontend-git-main-sudarshanaraos-projects.vercel.app",
+  "https://ecommerce-frontend-sudarshanaraos-projects.vercel.app"
+];
 
-app.use(cors());
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // allow server-to-server or Postman
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true
+}));
 
 app.use((req, res, next) => {
   console.log("Request Origin:", req.headers.origin);
