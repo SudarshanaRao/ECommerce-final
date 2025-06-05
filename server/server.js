@@ -61,6 +61,8 @@ app.get("/", (req, res) => {
 });
 
 
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // Handle preflight
 
 app.use(cookieParser());
 app.use(express.json());
