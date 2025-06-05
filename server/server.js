@@ -34,13 +34,13 @@ const PORT = process.env.PORT || 5000;
 const allowedOrigins = [
   "http://localhost:3000",
   "https://finstore.dharsh.xyz",
-  "https://ecommerce-frontend-blush-one.vercel.app"
+  "https://ecommerce-frontend-blush-one.vercel.app",
+  "https://ecommerce-frontend-git-main-sudarshanaraos-projects.vercel.app"
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (e.g., mobile apps, curl)
-    if (!origin) return callback(null, true);
+    if (!origin) return callback(null, true); // allow server-to-server or Postman
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
