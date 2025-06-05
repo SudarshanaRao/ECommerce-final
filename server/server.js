@@ -22,8 +22,8 @@ const commonFeatureRouter = require("./routes/common/feature-routes");
 //create a separate file for this and then import/use that file here
 
 mongoose
-  .connect("mongodb://localhost:27017/Ecommerce")
-  .then(() => console.log("MongoDB connected"))
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("Atlas MongoDB connected"))
   .catch((error) => console.log(error));
 
 const app = express();

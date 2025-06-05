@@ -6,7 +6,6 @@ import UserWishlistItems from "./wishlist-items-content";
 export default function WishlistWrapper({ setOpenWishlistSheet }) {
   const [animateIn, setAnimateIn] = useState(false);
   const [items, setItems] = useState([]); // Renamed from wishlistItems to items
-  console.log(items);
   
 
   useEffect(() => {

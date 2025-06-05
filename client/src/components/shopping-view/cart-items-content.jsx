@@ -21,6 +21,7 @@ function UserCartItemsContent({ cartItem }) {
   const product = productList.find((p) => p._id === cartItem?.productId);
   const price = cartItem?.salePrice > 0 ? cartItem?.salePrice : cartItem?.price;
 
+
   // Animate price change
   useEffect(() => {
     setPriceChanged(true);
@@ -86,6 +87,12 @@ function UserCartItemsContent({ cartItem }) {
           />
           <div className="flex-1">
             <h3 className="font-extrabold text-lg">{cartItem?.title}</h3>
+              {/* Show size here */}
+              {cartItem.size && (
+                <p className="text-sm text-gray-500 mt-1">
+                  Size: <span className="font-semibold text-gray-700">{cartItem.size}</span>
+                </p>
+              )}
             <div className="flex items-center gap-3 mt-2">
               <Button
                 as={motion.button}

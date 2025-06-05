@@ -5,7 +5,7 @@ const {
   logoutUser,
   authMiddleware,
   verifyOTP,
-  sendOtp
+  sendOtp,
 } = require("../../controllers/auth/auth-controller");
 
 const router = express.Router();

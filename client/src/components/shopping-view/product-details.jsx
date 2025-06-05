@@ -24,6 +24,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
   const { cartItems } = useSelector((state) => state.shopCart);
   const { reviews } = useSelector((state) => state.shopReview);
   const { toast } = useToast();
+  const [selectedSize, setSelectedSize] = useState("");
 
   useEffect(() => {
   if (!productDetails?._id) return;
@@ -57,30 +58,44 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
   };
 
   function handleAddToCart(productId, totalStock) {
-    if (!productId) return;
+  if (!productId) return;
 
-    const currentCartItems = cartItems?.items || [];
-    const existingItem = currentCartItems.find(
-      (item) => item.productId === productId
-    );
-
-    if (existingItem && existingItem.quantity + 1 > totalStock) {
-      toast({
-        title: `Only ${existingItem.quantity} quantity can be added for this item`,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    dispatch(addToCart({ userId: user?.id, productId, quantity: 1 })).then(
-      (data) => {
-        if (data?.payload?.success) {
-          dispatch(fetchCartItems(user?.id));
-          toast({ title: "Product is added to cart" });
-        }
-      }
-    );
+  if (["men", "women"].includes(productDetails?.category?.toLowerCase()) && !selectedSize) {
+    toast({
+      title: "Please select a size before adding to cart.",
+      variant: "destructive",
+    });
+    return;
   }
+
+  const currentCartItems = cartItems?.items || [];
+  const existingItem = currentCartItems.find(
+    (item) => item.productId === productId && item.size === selectedSize
+  );
+
+  if (existingItem && existingItem.quantity + 1 > totalStock) {
+    toast({
+      title: `Only ${existingItem.quantity} quantity can be added for this size`,
+      variant: "destructive",
+    });
+    return;
+  }
+
+  dispatch(
+    addToCart({
+      userId: user?.id,
+      productId,
+      quantity: 1,
+      size: selectedSize || "Free Size", // default fallback
+    })
+  ).then((data) => {
+    if (data?.payload?.success) {
+      dispatch(fetchCartItems(user?.id));
+      toast({ title: "Product added to cart" });
+    }
+  });
+}
+
 
   function handleDialogClose() {
     setOpen(false);
@@ -134,7 +149,53 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
               {productDetails?.description}
             </p>
           </div>
+          {(() => {
+            const category = productDetails?.category?.toLowerCase();
 
+            if (["men", "women"].includes(category)) {
+              return (
+                <div className="mb-4">
+                  <Label className="mb-2 block text-sm font-semibold">Select Size:</Label>
+                  <div className="flex gap-2">
+                    {["S", "M", "L", "XL"].map((size) => (
+                      <Button
+                        key={size}
+                        variant={selectedSize === size ? "default" : "outline"}
+                        onClick={() => setSelectedSize(size)}
+                        className={`rounded-full px-4 py-2 text-sm font-semibold ${
+                          selectedSize === size ? "bg-purple-600 text-white" : "hover:bg-purple-100"
+                        }`}
+                      >
+                        {size}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              );
+            } else if (category === "skincare") {
+              const skincareSizes = ["10ml", "30ml", "100ml", "500ml"];
+              return (
+                <div className="mb-4">
+                  <Label className="mb-2 block text-sm font-semibold">Select Size:</Label>
+                  <div className="flex gap-2">
+                    {skincareSizes.map((size) => (
+                      <Button
+                        key={size}
+                        variant={selectedSize === size ? "default" : "outline"}
+                        onClick={() => setSelectedSize(size)}
+                        className={`rounded-full px-4 py-2 text-sm font-semibold ${
+                          selectedSize === size ? "bg-purple-600 text-white" : "hover:bg-purple-100"
+                        }`}
+                      >
+                        {size}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              );
+            }
+            return null;
+          })()}
           <div className="flex items-center justify-between">
             <p
               className={`text-3xl font-bold text-primary ${

@@ -7,6 +7,9 @@ import UserCartItemsContent from "./cart-items-content";
 function UserCartWrapper({ cartItems, setOpenCartSheet }) {
   const navigate = useNavigate();
   const [animateIn, setAnimateIn] = useState(false);
+  
+  console.log(cartItems);
+  
 
   useEffect(() => {
     setAnimateIn(true);
