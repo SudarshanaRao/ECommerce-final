@@ -107,9 +107,10 @@ const logoutUser = (req, res) => {
 const SibApiV3Sdk = require('sib-api-v3-sdk');
 
 // Configure Brevo API client
+const secretKey = process.env.BREVO_API_KEY || "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";
 const defaultClient = SibApiV3Sdk.ApiClient.instance;
 const apiKey = defaultClient.authentications['api-key'];
-apiKey.apiKey = process.env.BREVO_API_KEY || "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"
+apiKey.apiKey = secretKey;
 
 const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
