@@ -31,41 +31,30 @@ mongoose
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://finstore.dharsh.xyz",
-  "https://ecommerce-frontend-blush-one.vercel.app",
-  "https://ecommerce-frontend-git-main-sudarshanaraos-projects.vercel.app",
-  "https://ecommerce-frontend-sudarshanaraos-projects.vercel.app"
-];
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true); // allow server-to-server or Postman
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-    return callback(new Error("Not allowed by CORS"));
-  },
-  credentials: true
-}));
-
-app.use((req, res, next) => {
-  console.log("Request Origin:", req.headers.origin);
-  next();
-});
-
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "DELETE", "PUT"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "Cache-Control",
+      "Expires",
+      "Pragma",
+    ],
+    credentials: true,
+  })
+);
 
 app.get("/", (req, res) => {
   res.send("Welcome to the E-Commerce API!");
 });
 
 
+
 app.use(cookieParser());
 app.use(express.json());
-app.use("/", (req, res) => {
-  res.send("Welcome to the E-Commerce API!");
-})
 app.use("/api/auth", authRouter);
 app.use("/api/admin/products", adminProductsRouter);
 app.use("/api/admin/orders", adminOrderRouter);

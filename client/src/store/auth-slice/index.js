@@ -1,8 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const BASE_URL = "https://finstore-backend.dharsh.xyz";
-
 const initialState = {
   isAuthenticated: false,
   isLoading: true,
@@ -15,10 +13,10 @@ export const registerUser = createAsyncThunk(
 
   async (formData) => {
     const response = await axios.post(
-      `${BASE_URL}/api/auth/register`,
+      "http://localhost:5000/api/auth/register",
       formData,
       {
-        withCredentials: false,
+        withCredentials: true,
       }
     );
 
@@ -31,7 +29,7 @@ export const sendOtp = createAsyncThunk(
   "/auth/sendOtp",
   async (email, thunkAPI) => {
     try {
-      const response = await axios.post(`${BASE_URL}/api/auth/send-otp`, { email });
+      const response = await axios.post("http://localhost:5000/api/auth/send-otp", { email });
       return response.data; // expects { success: true/false, message }
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data || "Failed to send OTP");
@@ -44,7 +42,7 @@ export const verifyOtp = createAsyncThunk(
   "/auth/verifyOtp",
   async ({ email, otp }, thunkAPI) => {
     try {
-      const res = await axios.post(`${BASE_URL}/api/auth/verify-otp`, { email, otp });
+      const res = await axios.post("http://localhost:5000/api/auth/verify-otp", { email, otp });
       return res.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response.data.message);
@@ -59,10 +57,10 @@ export const loginUser = createAsyncThunk(
 
   async (formData) => {
     const response = await axios.post(
-      `${BASE_URL}/api/auth/login`,
+      "http://localhost:5000/api/auth/login",
       formData,
       {
-        withCredentials: false,
+        withCredentials: true,
       }
     );
 
@@ -75,10 +73,10 @@ export const logoutUser = createAsyncThunk(
 
   async () => {
     const response = await axios.post(
-      `${BASE_URL}/api/auth/logout`,
+      "http://localhost:5000/api/auth/logout",
       {},
       {
-        withCredentials: false,
+        withCredentials: true,
       }
     );
 
@@ -91,9 +89,9 @@ export const checkAuth = createAsyncThunk(
 
   async () => {
     const response = await axios.get(
-      `${BASE_URL}/api/auth/check-auth`,
+      "http://localhost:5000/api/auth/check-auth",
       {
-        withCredentials: false,
+        withCredentials: true,
         headers: {
           "Cache-Control":
             "no-store, no-cache, must-revalidate, proxy-revalidate",
