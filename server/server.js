@@ -35,7 +35,8 @@ const allowedOrigins = [
   "http://localhost:3000",
   "https://finstore.dharsh.xyz",
   "https://ecommerce-frontend-blush-one.vercel.app",
-  "https://ecommerce-frontend-git-main-sudarshanaraos-projects.vercel.app"
+  "https://ecommerce-frontend-git-main-sudarshanaraos-projects.vercel.app",
+  "https://ecommerce-frontend-sudarshanaraos-projects.vercel.app"
 ];
 
 app.use(cors({
