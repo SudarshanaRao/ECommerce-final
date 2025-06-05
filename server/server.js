@@ -55,6 +55,9 @@ app.get("/", (req, res) => {
 
 app.use(cookieParser());
 app.use(express.json());
+app.use("/", (req, res) => {
+  res.send("Welcome to the E-Commerce API!");
+})
 app.use("/api/auth", authRouter);
 app.use("/api/admin/products", adminProductsRouter);
 app.use("/api/admin/orders", adminOrderRouter);
