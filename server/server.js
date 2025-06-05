@@ -47,7 +47,9 @@ app.use(
   })
 );
 
-
+app.get("/", (req, res) => {
+  res.send("Welcome to the E-Commerce API!");
+});
 
 
 
