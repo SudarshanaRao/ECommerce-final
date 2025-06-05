@@ -33,7 +33,7 @@ function AuthLogin() {
         }
       });
       } else {
-        toast({ title: data?.payload?.message, variant: "destructive" });
+        toast({ title: "Unable to login", variant: "destructive" });
       }
     });
   }
