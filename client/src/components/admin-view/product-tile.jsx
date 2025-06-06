@@ -9,6 +9,38 @@ function AdminProductTile({
   setCurrentEditedId,
   handleDelete,
 }) {
+
+  // Step 1: Compute lowest price/salePrice and the size label
+let price = product.price;
+let salePrice = product.salePrice;
+let lowestSizeLabel = "FreeSize";
+
+if (["men", "women"].includes(product.category) && product.sizes) {
+  const sizeEntries = Object.entries(product.sizes);
+
+  let minPrice = Infinity;
+  let minSalePrice = Infinity;
+
+  for (const [sizeLabel, sizeData] of sizeEntries) {
+    if (sizeData.price < minPrice) {
+      minPrice = sizeData.price;
+    }
+    if (sizeData.salePrice > 0 && sizeData.salePrice < minSalePrice) {
+      minSalePrice = sizeData.salePrice;
+      lowestSizeLabel = sizeLabel;
+    }
+  }
+
+  price = minPrice;
+  salePrice = minSalePrice !== Infinity ? minSalePrice : 0;
+}
+
+const hasDiscount = salePrice > 0 && price > salePrice;
+const discountPercentage = hasDiscount
+  ? Math.round(((price - salePrice) / price) * 100)
+  : 0;
+
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -22,6 +54,16 @@ function AdminProductTile({
             alt={product?.title}
             className="w-full h-[300px] object-cover transform group-hover:scale-105 transition duration-300"
           />
+
+          {hasDiscount && (
+            <div
+              title={`Lowest price for size ${lowestSizeLabel.toUpperCase()}`}
+              className="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg z-10"
+            >
+              {discountPercentage}% OFF
+            </div>
+          )}
+
         </div>
 
         <CardContent className="p-5">
@@ -31,16 +73,14 @@ function AdminProductTile({
           <div className="flex justify-between items-center">
             <span
               className={`text-lg font-medium ${
-                product?.salePrice > 0
-                  ? "line-through text-gray-500"
-                  : "text-blue-600"
+                hasDiscount ? "line-through text-gray-500" : "text-blue-600"
               }`}
             >
-              ₹{product?.price}
+              ₹{price}
             </span>
-            {product?.salePrice > 0 && (
+            {hasDiscount && (
               <span className="text-xl font-bold text-green-600 animate-pulse">
-                ₹{product?.salePrice}
+                ₹{salePrice}
               </span>
             )}
           </div>
@@ -68,5 +108,6 @@ function AdminProductTile({
     </motion.div>
   );
 }
+
 
 export default AdminProductTile;

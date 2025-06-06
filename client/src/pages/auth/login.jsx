@@ -17,57 +17,40 @@ function AuthLogin() {
   const dispatch = useDispatch();
   const { toast } = useToast();
 
-function onSubmit(event) {
-  event.preventDefault();
+  const onSubmit = async (event) => {
+    event.preventDefault();
 
-  dispatch(loginUser(formData))
-    .unwrap()
-    .then((payload) => {
-      if (payload.success) {
-        toast({ title: payload.message });
+    try {
+      const result = await dispatch(loginUser(formData));
+      const success = result?.payload?.success;
 
-        // Save email to localStorage for further verification if needed
+      if (success) {
+        toast({ title: result.payload.message });
         localStorage.setItem("email", formData.email);
 
-        // 🔐 Send OTP after login success
-        dispatch(sendOtp(formData.email)).then((otpData) => {
-          if (otpData?.payload?.success) {
-            toast({ title: "OTP sent to your email." });
-
-            // Optionally redirect to OTP verification screen
-            // navigate("/verify-otp"); 
-          } else {
-            toast({ title: "Failed to send OTP", variant: "destructive" });
-          }
-        });
+        const otpResult = await dispatch(sendOtp(formData.email));
+        if (otpResult?.payload) {
+          toast({ title: "OTP sent to your email." });
+        } else {
+          toast({ title: "Failed to send OTP", variant: "destructive" });
+        }
       } else {
-        toast({
-          title: payload.message || "Unable to login",
-          variant: "destructive",
-        });
+        toast({ title: "Unable to login", variant: "destructive" });
       }
-    })
-    .catch((error) => {
-      toast({
-        title: error.message || "Server error during login",
-        variant: "destructive",
-      });
-    });
-}
-
+    } catch (error) {
+      console.error(error);
+      toast({ title: "Something went wrong", variant: "destructive" });
+    }
+  };
 
   return (
     <div className="relative flex min-h-screen items-center justify-center p-4">
-      {/* Animated floating shapes */}
-
-      {/* Card */}
       <motion.div
         className="z-10 mx-auto w-full max-w-md space-y-6 rounded-xl bg-white p-8 shadow-2xl backdrop-blur-xl"
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        {/* Heading */}
         <motion.div
           className="text-center"
           initial={{ scale: 0.8, opacity: 0 }}
@@ -88,7 +71,6 @@ function onSubmit(event) {
           </p>
         </motion.div>
 
-        {/* Form */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -96,11 +78,21 @@ function onSubmit(event) {
         >
           <CommonForm
             formControls={loginFormControls}
-            buttonText={"Sign In"}
+            buttonText="Sign In"
             formData={formData}
             setFormData={setFormData}
             onSubmit={onSubmit}
           />
+
+          {/* Forgot Password Link */}
+          <div className="mt-4 text-right">
+            <Link
+              to="/forgot-password"
+              className="text-sm text-indigo-600 hover:underline"
+            >
+              Forgot Password?
+            </Link>
+          </div>
         </motion.div>
       </motion.div>
     </div>

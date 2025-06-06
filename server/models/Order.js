@@ -8,8 +8,9 @@ const OrderSchema = new mongoose.Schema({
       productId: String,
       title: String,
       image: String,
-      price: String,
+      price: Number,       // changed to Number for consistency
       quantity: Number,
+      size: String,        // added selected size per item
     },
   ],
   addressInfo: {
@@ -24,7 +25,10 @@ const OrderSchema = new mongoose.Schema({
   paymentMethod: String,
   paymentStatus: String,
   totalAmount: Number,
-  orderDate: Date,
+  orderDate: {
+    type: Date,
+    default: Date.now,
+  },
   orderUpdateDate: Date,
   paymentId: String,
   payerId: String,

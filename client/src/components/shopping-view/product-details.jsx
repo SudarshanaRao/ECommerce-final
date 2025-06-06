@@ -13,7 +13,6 @@ import StarRatingComponent from "../common/star-rating";
 import { useEffect, useState } from "react";
 import { addReview, getReviews } from "@/store/shop/review-slice";
 import { addWishlistItem, removeWishlistItem } from "@/utils/wishlist-utils";
-
 function ProductDetailsDialog({ open, setOpen, productDetails }) {
   const [reviewMsg, setReviewMsg] = useState("");
   const [rating, setRating] = useState(0);
@@ -25,6 +24,16 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
   const { reviews } = useSelector((state) => state.shopReview);
   const { toast } = useToast();
   const [selectedSize, setSelectedSize] = useState("");
+  const [selectedPrice, setSelectedPrice] = useState(null);
+  const [selectedSalePrice, setSelectedSalePrice] = useState(null);
+
+  const totalSizesStock = productDetails?.sizes
+  ? Object.values(productDetails.sizes).reduce(
+      (sum, sizeInfo) => sum + (sizeInfo?.stock || 0),
+      0
+    )
+  : 0;
+
 
   useEffect(() => {
   if (!productDetails?._id) return;
@@ -39,7 +48,33 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
   }
 }, [productDetails?._id]);
 
+useEffect(() => {
+  if (!productDetails?.sizes) return;
 
+  const sizeEntries = Object.entries(productDetails.sizes);
+
+  const sizeWithPrices = sizeEntries
+    .filter(([_, info]) => info && (info.salePrice || info.price || info.salePrice === 0))
+    .map(([size, info]) => {
+      const hasValidSale = info.salePrice && info.salePrice > 0;
+      const finalPrice = hasValidSale ? info.salePrice : info.price;
+
+      return {
+        size,
+        price: info.price,
+        salePrice: hasValidSale ? info.salePrice : null,
+        finalPrice,
+      };
+    });
+
+  if (sizeWithPrices.length > 0) {
+    const sorted = sizeWithPrices.sort((a, b) => a.finalPrice - b.finalPrice);
+    const defaultSize = sorted[0];
+    setSelectedSize(defaultSize.size);
+    setSelectedPrice(defaultSize.price);
+    setSelectedSalePrice(defaultSize.salePrice);
+  }
+}, [productDetails]);
 
   function handleRatingChange(newRating) {
     setRating(newRating);
@@ -130,10 +165,42 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
       ? reviews.reduce((sum, r) => sum + r.reviewValue, 0) / reviews.length
       : 0;
 
+  const discountPercent = selectedPrice && selectedSalePrice
+  ? Math.round(((selectedPrice - selectedSalePrice) / selectedPrice) * 100)
+  : null;
+
+
   return (
     <Dialog open={open} onOpenChange={handleDialogClose}>
       <DialogContent className="grid max-h-[85vh] overflow-y-auto grid-cols-2 gap-8 bg-gradient-to-br from-purple-200 via-pink-100 to-indigo-150 sm:p-12 max-w-[90vw] sm:max-w-[80vw] lg:max-w-[70vw]">
         <div className="relative overflow-hidden rounded-lg">
+          {/* Discount Tag (Top Right) */}
+          {discountPercent && (
+            <span className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full z-10">
+              {discountPercent}% OFF
+            </span>
+          )}
+
+          {/* Stock Info Tag (Top Left) */}
+          {(() => {
+            const stock = productDetails?.sizes?.[selectedSize]?.stock || 0;
+            if (stock === 5) {
+              return (
+                <span className="absolute top-2 left-2 bg-yellow-400 text-black text-xs px-2 py-1 rounded-full z-10">
+                  Few stocks left..!
+                </span>
+              );
+            }
+            if (stock < 10 && stock > 0) {
+              return (
+                <span className="absolute top-2 left-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full z-10">
+                  Hurry, Selling Fast..!
+                </span>
+              );
+            }
+            return null;
+          })()}
+
           <img
             src={productDetails?.image}
             alt={productDetails?.title || "Product Image"}
@@ -142,6 +209,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
             className="aspect-square w-full object-cover"
           />
         </div>
+
         <div>
           <div>
             <h1 className="text-2xl font-extrabold">{productDetails?.title}</h1>
@@ -157,18 +225,28 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                 <div className="mb-4">
                   <Label className="mb-2 block text-sm font-semibold">Select Size:</Label>
                   <div className="flex gap-2">
-                    {["S", "M", "L", "XL"].map((size) => (
+                    {["S", "M", "L", "XL"].map((size) => {
+                    const stock = productDetails.sizes?.[size]?.stock ?? 0; // Get stock for each size
+                    const isOutOfStock = stock === 0;
+
+                    return (
                       <Button
                         key={size}
                         variant={selectedSize === size ? "default" : "outline"}
-                        onClick={() => setSelectedSize(size)}
-                        className={`rounded-full px-4 py-2 text-sm font-semibold ${
-                          selectedSize === size ? "bg-purple-600 text-white" : "hover:bg-purple-100"
-                        }`}
+                        onClick={() => {
+                          if (isOutOfStock) return; // prevent click if out of stock
+                          setSelectedSize(size);
+                          const sizeInfo = productDetails.sizes?.[size];
+                          setSelectedPrice(sizeInfo?.price ?? null);
+                          setSelectedSalePrice(sizeInfo?.salePrice ?? null);
+                        }}
+                        disabled={isOutOfStock}
+                        className={isOutOfStock ? "out-of-stock" : ""}
                       >
                         {size}
                       </Button>
-                    ))}
+                    );
+                  })}
                   </div>
                 </div>
               );
@@ -196,20 +274,21 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
             }
             return null;
           })()}
-          <div className="flex items-center justify-between">
-            <p
-              className={`text-3xl font-bold text-primary ${
-                productDetails?.salePrice > 0 ? "line-through" : ""
-              }`}
-            >
-              ₹{productDetails?.price}
-            </p>
-            {productDetails?.salePrice > 0 && (
-              <p className="text-2xl font-bold text-muted-foreground">
-                ₹{productDetails?.salePrice}
+          <div className="flex items-center justify-between mt-4">
+          {selectedSalePrice ? (
+            <>
+              <p className="text-3xl font-bold text-primary line-through">
+                ₹{selectedPrice}
               </p>
-            )}
-          </div>
+              <p className="text-2xl font-bold text-muted-foreground">
+                ₹{selectedSalePrice}
+              </p>
+            </>
+          ) : (
+            <p className="text-3xl font-bold text-primary">₹{selectedPrice}</p>
+          )}
+        </div>
+
 
           <div className="flex items-center gap-2 mt-2">
             <StarRatingComponent rating={averageReview} />
@@ -217,15 +296,20 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
           </div>
 
           <div className="mt-5 mb-5">
-            {productDetails?.totalStock === 0 ? (
+            {(productDetails?.sizes?.[selectedSize || "Free Size"]?.stock || 0) === 0 ? (
               <Button className="w-full opacity-60 cursor-not-allowed" disabled>
                 Out of Stock
               </Button>
+
             ) : (
               <Button
                 className="w-full"
                 onClick={() =>
-                  handleAddToCart(productDetails?._id, productDetails?.totalStock)
+                  handleAddToCart(
+                    productDetails?._id,
+                    productDetails?.sizes?.[selectedSize || "Free Size"]?.stock || 0
+                  )
+
                 }
               >
                 Add to Cart

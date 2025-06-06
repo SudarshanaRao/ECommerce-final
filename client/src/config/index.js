@@ -89,27 +89,42 @@ export const addProductFormElements = [
     ],
   },
   {
-    label: "Price",
-    name: "price",
-    componentType: "input",
-    type: "number",
-    placeholder: "Enter product price",
-  },
-  {
-    label: "Sale Price",
-    name: "salePrice",
-    componentType: "input",
-    type: "number",
-    placeholder: "Enter sale price (optional)",
-  },
-  {
-    label: "Total Stock",
-    name: "totalStock",
-    componentType: "input",
-    type: "number",
-    placeholder: "Enter total stock",
+    label: "Sizes",
+    name: "sizes",
+    componentType: "dynamicGroup",
+    subFields: [
+      {
+        label: "Size",
+        name: "size",
+        type: "text",
+        componentType: "input",
+        placeholder: "e.g. S, M, L, XL or 6, 7, 8",
+      },
+      {
+        label: "Price",
+        name: "price",
+        type: "number",
+        componentType: "input",
+        placeholder: "Enter price for this size",
+      },
+      {
+        label: "Sale Price",
+        name: "salePrice",
+        type: "number",
+        componentType: "input",
+        placeholder: "Enter sale price (optional)",
+      },
+      {
+        label: "Stock",
+        name: "stock",
+        type: "number",
+        componentType: "input",
+        placeholder: "Enter stock for this size",
+      },
+    ],
   },
 ];
+
 
 export const shoppingViewHeaderMenuItems = [
   {

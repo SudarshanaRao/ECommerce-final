@@ -9,6 +9,36 @@ function ShoppingProductTile({
   handleGetProductDetails,
   handleAddtoCart,
 }) {
+  const isFashionCategory = product?.category === "men" || product?.category === "women";
+
+let originalPrice = product?.price;
+let salePrice = product?.salePrice;
+let finalPrice = salePrice > 0 ? salePrice : originalPrice;
+
+if (isFashionCategory && product?.sizes) {
+  const entries = Object.entries(product.sizes)
+    .filter(([_, info]) => info?.price)
+    .map(([_, info]) => {
+      const hasValidSale = info.salePrice && info.salePrice > 0;
+      const final = hasValidSale ? info.salePrice : info.price;
+      return {
+        price: info.price,
+        salePrice: hasValidSale ? info.salePrice : null,
+        finalPrice: final,
+      };
+    });
+
+  if (entries.length > 0) {
+    const min = entries.reduce((min, curr) =>
+      curr.finalPrice < min.finalPrice ? curr : min
+    );
+    originalPrice = min.price;
+    salePrice = min.salePrice;
+    finalPrice = min.finalPrice;
+  }
+}
+
+
   return (
     <Card
       className={cn(
@@ -49,13 +79,13 @@ function ShoppingProductTile({
           <div className="flex justify-between items-center">
             <span
               className={`${
-                product?.salePrice > 0 ? "line-through text-gray-400" : "text-indigo-700"
+                salePrice ? "line-through text-gray-400" : "text-indigo-700"
               } font-semibold`}
             >
-              ₹{product?.price}
+              ₹{originalPrice}
             </span>
-            {product?.salePrice > 0 && (
-              <span className="text-pink-600 font-bold">₹{product?.salePrice}</span>
+            {salePrice > 0 && (
+              <span className="text-pink-600 font-bold">₹{salePrice}</span>
             )}
           </div>
         </CardContent>

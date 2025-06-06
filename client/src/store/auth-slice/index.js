@@ -1,7 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-const BASE_URL = "http://localhost:5000/api/auth";
-const PROD_URL = "https://finstore-backend.dharsh.xyz";
 
 const initialState = {
   isAuthenticated: false,
@@ -15,11 +13,10 @@ export const registerUser = createAsyncThunk(
 
   async (formData) => {
     const response = await axios.post(
-      `${PROD_URL}/api/auth/register`,
+      "http://localhost:5000/api/auth/register",
       formData,
       {
         withCredentials: true,
-        credentials: "include",
       }
     );
 
@@ -32,7 +29,7 @@ export const sendOtp = createAsyncThunk(
   "/auth/sendOtp",
   async (email, thunkAPI) => {
     try {
-      const response = await axios.post(`${PROD_URL}/api/auth/send-otp`, { email });
+      const response = await axios.post("http://localhost:5000/api/auth/send-otp", { email });
       return response.data; // expects { success: true/false, message }
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data || "Failed to send OTP");
@@ -45,7 +42,7 @@ export const verifyOtp = createAsyncThunk(
   "/auth/verifyOtp",
   async ({ email, otp }, thunkAPI) => {
     try {
-      const res = await axios.post(`${PROD_URL}/api/auth/verify-otp`, { email, otp });
+      const res = await axios.post("http://localhost:5000/api/auth/verify-otp", { email, otp });
       return res.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response.data.message);
@@ -58,20 +55,16 @@ export const verifyOtp = createAsyncThunk(
 export const loginUser = createAsyncThunk(
   "/auth/login",
 
-  async (formData, thunkAPI) => {
-    try {
-      const response = await axios.post(
-        `${PROD_URL}/api/auth/login`,
-        formData,
-        {
-          withCredentials: true,
-          credentials: "include",
-        }
-      );
-      return response.data;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response?.data || { message: "Login failed" });
-    }
+  async (formData) => {
+    const response = await axios.post(
+      "http://localhost:5000/api/auth/login",
+      formData,
+      {
+        withCredentials: true,
+      }
+    );
+
+    return response.data;
   }
 );
 
@@ -80,11 +73,10 @@ export const logoutUser = createAsyncThunk(
 
   async () => {
     const response = await axios.post(
-      `${PROD_URL}/api/auth/logout`,
+      "http://localhost:5000/api/auth/logout",
       {},
       {
         withCredentials: true,
-        credentials: "include",
       }
     );
 
@@ -97,10 +89,9 @@ export const checkAuth = createAsyncThunk(
 
   async () => {
     const response = await axios.get(
-      `${PROD_URL}/api/auth/check-auth`,
+      "http://localhost:5000/api/auth/check-auth",
       {
         withCredentials: true,
-        credentials: "include",
         headers: {
           "Cache-Control":
             "no-store, no-cache, must-revalidate, proxy-revalidate",
@@ -148,12 +139,9 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
       })
       .addCase(checkAuth.pending, (state) => {
-        console.log("Checking authentication...");
-        
         state.isLoading = true;
       })
       .addCase(checkAuth.fulfilled, (state, action) => {
-        console.log("Authentication checked");
         state.isLoading = false;
         state.user = action.payload.success ? action.payload.user : null;
         state.user = {
@@ -163,7 +151,6 @@ const authSlice = createSlice({
         state.isAuthenticated = action.payload.success;
       })
       .addCase(checkAuth.rejected, (state) => {
-        console.log("Authentication failed");
         state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;

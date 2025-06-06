@@ -1,5 +1,14 @@
 const mongoose = require("mongoose");
 
+const SizeDetailSchema = new mongoose.Schema(
+  {
+    stock: Number,
+    price: Number,
+    salePrice: Number,
+  },
+  { _id: false }
+);
+
 const ProductSchema = new mongoose.Schema(
   {
     image: String,
@@ -10,7 +19,14 @@ const ProductSchema = new mongoose.Schema(
     price: Number,
     salePrice: Number,
     totalStock: Number,
-    averageReview: Number,
+    averageReview: {
+      type: Number,
+      default: 0,
+    },
+    sizes: {
+      type: Map,
+      of: SizeDetailSchema, // S, M, L, etc. as keys
+    },
   },
   { timestamps: true }
 );

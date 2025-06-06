@@ -53,6 +53,7 @@ function ShoppingHome() {
   const { featureImageList } = useSelector((state) => state.commonFeature);
 
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(8);
 
   const { user } = useSelector((state) => state.auth);
 
@@ -210,33 +211,45 @@ function ShoppingHome() {
       </section>
 
       <section
-          className="relative py-12 bg-white"
-          style={{
-            backgroundImage: `url(${FinStoreLogo})`,
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "center",
-            backgroundSize: "40%",
-            opacity: 1,
-          }}
-        >
-          <div className="absolute inset-0 opacity-5 pointer-events-none bg-center bg-no-repeat bg-contain"
-              style={{ backgroundImage: `url(${FinStoreLogo})` }}
-          />
-          <div className="relative container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-8 text-purple-800">Feature Products</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {productList?.length > 0 &&
-                productList.map((productItem, index) => (
-                  <ShoppingProductTile
-                    key={productItem._id || index}
-                    handleGetProductDetails={handleGetProductDetails}
-                    product={productItem}
-                    handleAddtoCart={handleAddtoCart}
-                  />
-                ))}
-            </div>
+        className="relative py-12 bg-white"
+        style={{
+          backgroundImage: `url(${FinStoreLogo})`,
+          backgroundRepeat: "no-repeat",
+          backgroundPosition: "center",
+          backgroundSize: "40%",
+          opacity: 1,
+        }}
+      >
+        <div
+          className="absolute inset-0 opacity-5 pointer-events-none bg-center bg-no-repeat bg-contain"
+          style={{ backgroundImage: `url(${FinStoreLogo})` }}
+        />
+        <div className="relative container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-8 text-purple-800">Feature Products</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {productList?.length > 0 &&
+              productList.slice(0, visibleCount).map((productItem, index) => (
+                <ShoppingProductTile
+                  key={productItem._id || index}
+                  handleGetProductDetails={handleGetProductDetails}
+                  product={productItem}
+                  handleAddtoCart={handleAddtoCart}
+                />
+              ))}
           </div>
-        </section>
+          {visibleCount < productList.length && (
+            <div className="text-center mt-6">
+              <button
+                onClick={() => setVisibleCount((prev) => prev + 20)}
+                className="bg-purple-600 text-white px-6 py-2 rounded hover:bg-purple-700 transition"
+              >
+                Show More
+              </button>
+            </div>
+          )}
+        </div>
+      </section>
+
       <ProductDetailsDialog
         open={openDetailsDialog}
         setOpen={setOpenDetailsDialog}
