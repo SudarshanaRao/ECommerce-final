@@ -50,7 +50,7 @@ app.use(
       if (allowedOrigins.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
-        callback(new Error("CORS policy: This origin is not allowed"));
+        callback(new Error("CORS policy: This origin is not allowed..!"));
       }
     },
     methods: ["GET", "POST", "DELETE", "PUT"],
