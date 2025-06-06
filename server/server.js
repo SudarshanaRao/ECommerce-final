@@ -29,7 +29,7 @@ mongoose
   .then(() => console.log("Atlas MongoDB connected Successfully"))
   .catch((error) => console.log("DB is not able to connect: ", error));
 
-const app = express();
+const app = express();  
 const PORT = process.env.PORT || 5000;
 
 const allowedOrigins = [
