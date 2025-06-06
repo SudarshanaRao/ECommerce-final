@@ -33,7 +33,7 @@ const PORT = process.env.PORT || 5000;
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "*",
     methods: ["GET", "POST", "DELETE", "PUT"],
     allowedHeaders: [
       "Content-Type",
@@ -45,6 +45,7 @@ app.use(
     credentials: true,
   })
 );
+app.options('*', cors());
 
 app.get("/", (req, res) => {
   res.send("Welcome to the E-Commerce API!");
