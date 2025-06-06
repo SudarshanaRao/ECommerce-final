@@ -80,7 +80,7 @@ export const logoutUser = createAsyncThunk(
 
   async () => {
     const response = await axios.post(
-      `${BASE_URL}/api/auth/logout`,
+      `${PROD_URL}/api/auth/logout`,
       {},
       {
         withCredentials: true,
