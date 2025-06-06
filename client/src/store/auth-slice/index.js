@@ -62,7 +62,7 @@ export const loginUser = createAsyncThunk(
       `${PROD_URL}/api/auth/login`,
       formData,
       {
-        withCredentials: false,
+        withCredentials: true,
       }
     );
 
@@ -93,7 +93,7 @@ export const checkAuth = createAsyncThunk(
     const response = await axios.get(
       `${PROD_URL}/api/auth/check-auth`,
       {
-        withCredentials: false,
+        withCredentials: true,
         headers: {
           "Cache-Control":
             "no-store, no-cache, must-revalidate, proxy-revalidate",

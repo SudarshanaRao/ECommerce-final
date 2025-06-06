@@ -30,10 +30,27 @@ mongoose
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+const allowedOrigins = [
+  "https://ecommerce-frontend-7in2qytbi-sudarshanaraos-projects.vercel.app",
+  "https://ecommerce-frontend-blush-one.vercel.app",
+  "https://finstore.dharsh.xyz",
+  "https://ecommerce-frontend-sudarshanaraos-projects.vercel.app",
+  "https://ecommerce-frontend-git-main-sudarshanaraos-projects.vercel.app",
+  // add all other Vercel domains you expect
+];
 
 app.use(
   cors({
-    origin: "*",
+    origin: function (origin, callback) {
+      // allow requests with no origin (like mobile apps, curl)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS policy: This origin is not allowed"));
+      }
+    },
     methods: ["GET", "POST", "DELETE", "PUT"],
     allowedHeaders: [
       "Content-Type",
