@@ -27,7 +27,7 @@ mongoose
   useUnifiedTopology: true
 })
   .then(() => console.log("Atlas MongoDB connected Successfully"))
-  .catch((error) => console.log(error));
+  .catch((error) => console.log("DB is not able to connect: ", error));
 
 const app = express();
 const PORT = process.env.PORT || 5000;
