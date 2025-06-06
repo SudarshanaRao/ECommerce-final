@@ -161,7 +161,7 @@ const sendOtp = async (req, res) => {
 // Verify OTP endpoint
 const verifyOTP = (req, res) => {
   const { email, otp } = req.body;
-  if (!email || !otp) return res.status(400).json({ success: false, message: "Email and OTP are required." });
+  if (!email || !otp) return res.status(400).json({ success: false, message: "Email and OTP are required.!" });
 
   const record = otpStore[email];
   if (!record) {
