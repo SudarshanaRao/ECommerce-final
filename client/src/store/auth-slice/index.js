@@ -145,9 +145,12 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
       })
       .addCase(checkAuth.pending, (state) => {
+        console.log("Checking authentication...");
+        
         state.isLoading = true;
       })
       .addCase(checkAuth.fulfilled, (state, action) => {
+        console.log("Authentication checked");
         state.isLoading = false;
         state.user = action.payload.success ? action.payload.user : null;
         state.user = {
@@ -157,6 +160,7 @@ const authSlice = createSlice({
         state.isAuthenticated = action.payload.success;
       })
       .addCase(checkAuth.rejected, (state) => {
+        console.log("Authentication failed");
         state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;
