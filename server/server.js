@@ -24,7 +24,7 @@ const commonFeatureRouter = require("./routes/common/feature-routes");
 const mongoURI = process.env.MONGO_URI;
 mongoose
   .connect(mongoURI)
-  .then(() => console.log("Atlas MongoDB connected"))
+  .then(() => console.log("Atlas MongoDB connected Successfully"))
   .catch((error) => console.log(error));
 
 const app = express();
