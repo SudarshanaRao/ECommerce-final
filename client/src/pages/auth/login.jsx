@@ -17,24 +17,44 @@ function AuthLogin() {
   const dispatch = useDispatch();
   const { toast } = useToast();
 
-  function onSubmit(event) {
-    event.preventDefault();
+function onSubmit(event) {
+  event.preventDefault();
 
-    dispatch(loginUser(formData))
-  .unwrap()
-  .then((payload) => {
-    if (payload.success) {
-      toast({ title: payload.message });
-      // ...
-    } else {
-      toast({ title: payload.message || "Unable to login", variant: "destructive" });
-    }
-  })
-  .catch((error) => {
-    toast({ title: error.message || "Server error during login", variant: "destructive" });
-  });
+  dispatch(loginUser(formData))
+    .unwrap()
+    .then((payload) => {
+      if (payload.success) {
+        toast({ title: payload.message });
 
-  }
+        // Save email to localStorage for further verification if needed
+        localStorage.setItem("email", formData.email);
+
+        // 🔐 Send OTP after login success
+        dispatch(sendOtp(formData.email)).then((otpData) => {
+          if (otpData?.payload?.success) {
+            toast({ title: "OTP sent to your email." });
+
+            // Optionally redirect to OTP verification screen
+            // navigate("/verify-otp"); 
+          } else {
+            toast({ title: "Failed to send OTP", variant: "destructive" });
+          }
+        });
+      } else {
+        toast({
+          title: payload.message || "Unable to login",
+          variant: "destructive",
+        });
+      }
+    })
+    .catch((error) => {
+      toast({
+        title: error.message || "Server error during login",
+        variant: "destructive",
+      });
+    });
+}
+
 
   return (
     <div className="relative flex min-h-screen items-center justify-center p-4">
