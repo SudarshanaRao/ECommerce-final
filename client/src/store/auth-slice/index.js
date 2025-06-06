@@ -1,5 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+const BASE_URL = "http://localhost:5000/api/auth";
+const PROD_URL = "https://finstore-backend.dharsh.xyz";
 
 const initialState = {
   isAuthenticated: false,
@@ -13,7 +15,7 @@ export const registerUser = createAsyncThunk(
 
   async (formData) => {
     const response = await axios.post(
-      "http://localhost:5000/api/auth/register",
+      `${PROD_URL}/api/auth/register`,
       formData,
       {
         withCredentials: true,
@@ -29,7 +31,7 @@ export const sendOtp = createAsyncThunk(
   "/auth/sendOtp",
   async (email, thunkAPI) => {
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/send-otp", { email });
+      const response = await axios.post(`${PROD_URL}/api/auth/send-otp`, { email });
       return response.data; // expects { success: true/false, message }
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data || "Failed to send OTP");
@@ -42,7 +44,7 @@ export const verifyOtp = createAsyncThunk(
   "/auth/verifyOtp",
   async ({ email, otp }, thunkAPI) => {
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/verify-otp", { email, otp });
+      const res = await axios.post(`${PROD_URL}/api/auth/verify-otp`, { email, otp });
       return res.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response.data.message);
@@ -57,7 +59,7 @@ export const loginUser = createAsyncThunk(
 
   async (formData) => {
     const response = await axios.post(
-      "http://localhost:5000/api/auth/login",
+      `${PROD_URL}/api/auth/login`,
       formData,
       {
         withCredentials: true,
@@ -73,7 +75,7 @@ export const logoutUser = createAsyncThunk(
 
   async () => {
     const response = await axios.post(
-      "http://localhost:5000/api/auth/logout",
+      `${BASE_URL}/api/auth/logout`,
       {},
       {
         withCredentials: true,
@@ -89,7 +91,7 @@ export const checkAuth = createAsyncThunk(
 
   async () => {
     const response = await axios.get(
-      "http://localhost:5000/api/auth/check-auth",
+      `${PROD_URL}/api/auth/check-auth`,
       {
         withCredentials: true,
         headers: {
