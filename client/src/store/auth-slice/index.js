@@ -58,17 +58,20 @@ export const verifyOtp = createAsyncThunk(
 export const loginUser = createAsyncThunk(
   "/auth/login",
 
-  async (formData) => {
-    const response = await axios.post(
-      `${PROD_URL}/api/auth/login`,
-      formData,
-      {
-        withCredentials: true,
-        credentials: "include",
-      }
-    );
-
-    return response.data;
+  async (formData, thunkAPI) => {
+    try {
+      const response = await axios.post(
+        `${PROD_URL}/api/auth/login`,
+        formData,
+        {
+          withCredentials: true,
+          credentials: "include",
+        }
+      );
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data || { message: "Login failed" });
+    }
   }
 );
 

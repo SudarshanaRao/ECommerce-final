@@ -20,22 +20,20 @@ function AuthLogin() {
   function onSubmit(event) {
     event.preventDefault();
 
-    dispatch(loginUser(formData)).then((data) => {
-      if (data?.payload?.success) {
-        toast({ title: data?.payload?.message });
-        localStorage.setItem("email", formData?.email);
-        // After login success, send OTP email
-      dispatch(sendOtp(formData.email)).then((otpData) => {
-        if (otpData?.payload) {
-          toast({ title: "OTP sent to your email." });
-        } else {
-          toast({ title: "Failed to send OTP", variant: "destructive" });
-        }
-      });
-      } else {
-        toast({ title: "Unable to login", variant: "destructive" });
-      }
-    });
+    dispatch(loginUser(formData))
+  .unwrap()
+  .then((payload) => {
+    if (payload.success) {
+      toast({ title: payload.message });
+      // ...
+    } else {
+      toast({ title: payload.message || "Unable to login", variant: "destructive" });
+    }
+  })
+  .catch((error) => {
+    toast({ title: error.message || "Server error during login", variant: "destructive" });
+  });
+
   }
 
   return (
