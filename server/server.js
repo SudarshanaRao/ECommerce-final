@@ -21,15 +21,13 @@ const commonFeatureRouter = require("./routes/common/feature-routes");
 //create a database connection -> u can also
 //create a separate file for this and then import/use that file here
 
+const mongoURI = process.env.MONGO_URI;
 mongoose
-  .connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-  .then(() => console.log("Atlas MongoDB connected Successfully"))
-  .catch((error) => console.log("DB is not able to connect: ", error));
+  .connect(mongoURI)
+  .then(() => console.log("Atlas MongoDB connected"))
+  .catch((error) => console.log(error));
 
-const app = express();  
+const app = express();
 const PORT = process.env.PORT || 5000;
 
 const allowedOrigins = [
@@ -50,7 +48,7 @@ app.use(
       if (allowedOrigins.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
-        callback(new Error("CORS policy: This origin is not allowed..!"));
+        callback(new Error("CORS policy: This origin is not allowed"));
       }
     },
     methods: ["GET", "POST", "DELETE", "PUT"],
