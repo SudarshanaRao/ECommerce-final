@@ -19,6 +19,7 @@ export const registerUser = createAsyncThunk(
       formData,
       {
         withCredentials: true,
+        credentials: "include",
       }
     );
 
@@ -63,6 +64,7 @@ export const loginUser = createAsyncThunk(
       formData,
       {
         withCredentials: true,
+        credentials: "include",
       }
     );
 
@@ -79,6 +81,7 @@ export const logoutUser = createAsyncThunk(
       {},
       {
         withCredentials: true,
+        credentials: "include",
       }
     );
 
@@ -94,6 +97,7 @@ export const checkAuth = createAsyncThunk(
       `${PROD_URL}/api/auth/check-auth`,
       {
         withCredentials: true,
+        credentials: "include",
         headers: {
           "Cache-Control":
             "no-store, no-cache, must-revalidate, proxy-revalidate",

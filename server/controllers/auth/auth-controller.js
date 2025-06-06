@@ -69,7 +69,7 @@ const loginUser = async (req, res) => {
         userName: checkUser.userName,
         isOtpVerified: checkUser.isOtpVerified,
       },
-      "CLIENT_SECRET_KEY",
+      process.env.JWT_SECRET_KEY,
       { expiresIn: "60m" }
     );
 
