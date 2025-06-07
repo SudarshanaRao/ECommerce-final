@@ -291,7 +291,7 @@ const isFormValid = () => {
       setFormData={setFormData}
       buttonText={currentEditedId !== null ? "Update 🚀" : "Add 🎯"}
       formControls={addProductFormElements}
-      isBtnDisabled={isFormValid()}
+      isBtnDisabled={!isFormValid()}
     />
   </div>
 </SheetContent>

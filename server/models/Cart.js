@@ -21,7 +21,15 @@ const CartSchema = new mongoose.Schema(
         },
         size: {
           type: String,
-          required: true, // assuming size is always required for cart items
+          required: false, // optional size
+        },
+        price: {
+          type: Number,
+          required: true,
+        },
+        salePrice: {
+          type: Number,
+          required: true,
         },
       },
     ],

@@ -68,6 +68,9 @@ function UserCartItemsContent({ cartItem }) {
     }, 400);
   }
 
+  console.log(cartItems);
+  
+
   return (
     <AnimatePresence>
       {!removing && (

@@ -11,20 +11,27 @@ const initialState = {
 
 export const addToCart = createAsyncThunk(
   "cart/addToCart",
-  async ({ userId, productId, quantity }) => {
+  async ({ userId, productId, quantity, size, price, salePrice }) => {
     const response = await axios.post(`${BASE_URL}/add`, {
       userId,
       productId,
       quantity,
+      size,
+      price,
+      salePrice
     });
+    
     return response.data;
   }
 );
+
 
 export const fetchCartItems = createAsyncThunk(
   "cart/fetchCartItems",
   async (userId) => {
     const response = await axios.get(`${BASE_URL}/get/${userId}`);
+    console.log("Fetching cart items: ", response.data);
+    
     return response.data;
   }
 );

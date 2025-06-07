@@ -95,7 +95,10 @@ useEffect(() => {
   function handleAddToCart(productId, totalStock) {
   if (!productId) return;
 
-  if (["men", "women"].includes(productDetails?.category?.toLowerCase()) && !selectedSize) {
+  const category = productDetails?.category?.toLowerCase();
+  const requiresSize = ["men", "women", "footwear"].includes(category);
+
+  if (requiresSize && !selectedSize) {
     toast({
       title: "Please select a size before adding to cart.",
       variant: "destructive",
@@ -103,33 +106,47 @@ useEffect(() => {
     return;
   }
 
+  // Extract size-specific details
+  const sizeDetails = requiresSize ? productDetails?.sizes?.[selectedSize] : null;
+
+  const price = sizeDetails?.price ?? productDetails?.price ?? 0;
+  const salePrice = sizeDetails?.salePrice ?? productDetails?.salePrice ?? 0;
+  const availableQuantity = sizeDetails?.stock ?? totalStock ?? 0;
+
   const currentCartItems = cartItems?.items || [];
   const existingItem = currentCartItems.find(
-    (item) => item.productId === productId && item.size === selectedSize
+    (item) =>
+      item.productId === productId &&
+      (!requiresSize || item.size === selectedSize)
   );
 
-  if (existingItem && existingItem.quantity + 1 > totalStock) {
+  if (existingItem && existingItem.quantity + 1 > availableQuantity) {
     toast({
-      title: `Only ${existingItem.quantity} quantity can be added for this size`,
+      title: `Only ${availableQuantity} in stock${requiresSize ? ` for size ${selectedSize}` : ""}`,
       variant: "destructive",
     });
     return;
   }
 
-  dispatch(
-    addToCart({
-      userId: user?.id,
-      productId,
-      quantity: 1,
-      size: selectedSize || "Free Size", // default fallback
-    })
-  ).then((data) => {
+  const payload = {
+    userId: user?.id,
+    productId,
+    quantity: 1,
+    price,
+    salePrice,
+    ...(requiresSize && { size: selectedSize }),
+  };
+  
+
+  dispatch(addToCart(payload)).then((data) => {
     if (data?.payload?.success) {
       dispatch(fetchCartItems(user?.id));
       toast({ title: "Product added to cart" });
     }
   });
 }
+
+
 
 
   function handleDialogClose() {
@@ -168,6 +185,45 @@ useEffect(() => {
   const discountPercent = selectedPrice && selectedSalePrice
   ? Math.round(((selectedPrice - selectedSalePrice) / selectedPrice) * 100)
   : null;
+
+  useEffect(() => {
+  const category = productDetails?.category?.toLowerCase();
+
+  if (!productDetails) return;
+
+  if (category !== "men" && category !== "women" && category !== "skincare") {
+    const sizesObj = productDetails.sizes;
+    
+    if (sizesObj && Object.keys(sizesObj).length > 0) {
+      const sizeWithPrices = Object.entries(sizesObj)
+        .filter(([_, info]) => info && (info.salePrice || info.price || info.salePrice === 0))
+        .map(([size, info]) => {
+          const hasValidSale = info.salePrice && info.salePrice > 0;
+          const finalPrice = hasValidSale ? info.salePrice : info.price;
+
+          return {
+            size,
+            price: info.price,
+            salePrice: hasValidSale ? info.salePrice : null,
+            finalPrice,
+          };
+        });
+
+      if (sizeWithPrices.length > 0) {
+        const sorted = sizeWithPrices.sort((a, b) => a.finalPrice - b.finalPrice);
+        const defaultSize = sorted[0];
+        setSelectedSize(defaultSize.size);
+        setSelectedPrice(defaultSize.price);
+        setSelectedSalePrice(defaultSize.salePrice);
+        return;
+      }
+    }
+
+    // Fallback: no sizes
+    setSelectedPrice(productDetails.price ?? null);
+    setSelectedSalePrice(productDetails.salePrice ?? null);
+  }
+}, [productDetails]);
 
 
   return (
@@ -217,6 +273,7 @@ useEffect(() => {
               {productDetails?.description}
             </p>
           </div>
+
           {(() => {
             const category = productDetails?.category?.toLowerCase();
 
@@ -226,27 +283,27 @@ useEffect(() => {
                   <Label className="mb-2 block text-sm font-semibold">Select Size:</Label>
                   <div className="flex gap-2">
                     {["S", "M", "L", "XL"].map((size) => {
-                    const stock = productDetails.sizes?.[size]?.stock ?? 0; // Get stock for each size
-                    const isOutOfStock = stock === 0;
+                      const stock = productDetails.sizes?.[size]?.stock ?? 0;
+                      const isOutOfStock = stock === 0;
 
-                    return (
-                      <Button
-                        key={size}
-                        variant={selectedSize === size ? "default" : "outline"}
-                        onClick={() => {
-                          if (isOutOfStock) return; // prevent click if out of stock
-                          setSelectedSize(size);
-                          const sizeInfo = productDetails.sizes?.[size];
-                          setSelectedPrice(sizeInfo?.price ?? null);
-                          setSelectedSalePrice(sizeInfo?.salePrice ?? null);
-                        }}
-                        disabled={isOutOfStock}
-                        className={isOutOfStock ? "out-of-stock" : ""}
-                      >
-                        {size}
-                      </Button>
-                    );
-                  })}
+                      return (
+                        <Button
+                          key={size}
+                          variant={selectedSize === size ? "default" : "outline"}
+                          onClick={() => {
+                            if (isOutOfStock) return;
+                            setSelectedSize(size);
+                            const sizeInfo = productDetails.sizes?.[size];
+                            setSelectedPrice(sizeInfo?.price ?? null);
+                            setSelectedSalePrice(sizeInfo?.salePrice ?? null);
+                          }}
+                          disabled={isOutOfStock}
+                          className={isOutOfStock ? "out-of-stock" : ""}
+                        >
+                          {size}
+                        </Button>
+                      );
+                    })}
                   </div>
                 </div>
               );
@@ -271,25 +328,23 @@ useEffect(() => {
                   </div>
                 </div>
               );
-            }
-            return null;
+            } return null;
           })()}
+
           <div className="flex items-center justify-between mt-4">
-          {selectedSalePrice ? (
-            <>
-              <p className="text-3xl font-bold text-primary line-through">
-                ₹{selectedPrice}
-              </p>
-              <p className="text-2xl font-bold text-muted-foreground">
-                ₹{selectedSalePrice}
-              </p>
-            </>
-          ) : (
-            <p className="text-3xl font-bold text-primary">₹{selectedPrice}</p>
-          )}
-        </div>
-
-
+            {selectedSalePrice ? (
+              <>
+                <p className="text-3xl font-bold text-primary line-through">
+                  ₹{selectedPrice}
+                </p>
+                <p className="text-2xl font-bold text-muted-foreground">
+                  ₹{selectedSalePrice}
+                </p>
+              </>
+            ) : (
+              <p className="text-3xl font-bold text-primary">₹{selectedPrice}</p>
+            )}
+          </div>
           <div className="flex items-center gap-2 mt-2">
             <StarRatingComponent rating={averageReview} />
             <span className="text-muted-foreground">({averageReview.toFixed(2)})</span>
