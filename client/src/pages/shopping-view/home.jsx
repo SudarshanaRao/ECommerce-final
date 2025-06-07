@@ -186,69 +186,109 @@ function ShoppingHome() {
         </div>
       </section>
 
-      <section className="py-12 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-8">Shop by Brand</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {brandsWithIcon.map((brandItem, index) => (
-              <Card
-                key={brandItem.label || index}
-                onClick={() => handleNavigateToListingPage(brandItem, "brand")}
-                className="cursor-pointer hover:shadow-lg transition-shadow"
-              >
-                <CardContent className="flex flex-col items-center justify-center p-6">
-                  <img
-                    src={brandItem.icon}
-                    alt={brandItem.label}
-                    className="w-12 h-12 mb-4 object-contain rounded-xl"
-                  />
-                  <span className="font-bold">{brandItem.label}</span>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+      <section className="py-16 bg-gradient-to-br from-purple-50 via-white to-purple-100">
+  <div className="container mx-auto px-4">
+    <h2 className="text-4xl font-extrabold text-center text-purple-800 mb-12 tracking-wide animate-fade-in">
+      ✨ Shop by Brand ✨
+    </h2>
 
-      <section
-        className="relative py-12 bg-white"
-        style={{
-          backgroundImage: `url(${FinStoreLogo})`,
-          backgroundRepeat: "no-repeat",
-          backgroundPosition: "center",
-          backgroundSize: "40%",
-          opacity: 1,
-        }}
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+      {brandsWithIcon.map((brandItem, index) => (
+        <Card
+          key={brandItem.label || index}
+          onClick={() => handleNavigateToListingPage(brandItem, "brand")}
+          className="cursor-pointer transition-transform hover:scale-105 bg-white bg-opacity-40 backdrop-blur-lg border border-purple-100 shadow-xl rounded-2xl"
+        >
+          <CardContent className="flex flex-col items-center justify-center p-6 gap-2">
+            <img
+              src={brandItem.icon}
+              alt={brandItem.label}
+              className="w-16 h-16 object-contain rounded-full animate-spin-slow shadow-md"
+            />
+            <span className="font-semibold text-purple-700 text-center text-sm">
+              {brandItem.label}
+            </span>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  </div>
+</section>
+
+
+      <section className="relative py-12 bg-gradient-to-br from-purple-50 via-white to-purple-100">
+  <div className="container mx-auto px-4 relative">
+    <div className="flex items-center justify-between mb-6">
+      <h2 className="text-3xl font-extrabold text-purple-800 tracking-tight flex items-center gap-2 animate-fade-in">
+        <Sparkles className="text-purple-600 animate-bounce" /> Featured Products
+      </h2>
+      <Button
+        onClick={() => navigate("/shop/listing")}
+        className="bg-purple-600 text-white hover:bg-purple-700 transition-all duration-300"
       >
+        Show More →
+      </Button>
+    </div>
+
+    <div className="relative group">
+      <div className="flex items-center">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => document.getElementById("feature-scroll").scrollBy({ left: -300, behavior: 'smooth' })}
+          className="absolute z-10 left-0 top-1/2 transform -translate-y-1/2 bg-white shadow-md hover:bg-purple-100 transition hidden group-hover:flex"
+        >
+          <ChevronLeftIcon className="w-5 h-5 text-purple-800" />
+        </Button>
+
         <div
-          className="absolute inset-0 opacity-5 pointer-events-none bg-center bg-no-repeat bg-contain"
-          style={{ backgroundImage: `url(${FinStoreLogo})` }}
-        />
-        <div className="relative container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-8 text-purple-800">Feature Products</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {productList?.length > 0 &&
-              productList.slice(0, visibleCount).map((productItem, index) => (
+          id="feature-scroll"
+          className="overflow-x-auto no-scrollbar scroll-smooth flex gap-4 pr-6 pl-12 py-2"
+          style={{ scrollSnapType: "x mandatory" }}
+        >
+          {productList
+            ?.filter((productItem) => {
+              const category = productItem.category?.toLowerCase();
+
+              if (["men", "women", "footwear"].includes(category)) {
+                // Check if any size has stock > 0
+                return Object.values(productItem.sizes || {}).some(
+                  (sizeObj) => sizeObj?.stock > 0
+                );
+              }
+
+              // For other categories, check totalStock
+              return productItem.totalStock > 0;
+            })
+            .slice(0, 8)
+            .map((productItem, index) => (
+              <div
+                key={productItem._id || index}
+                className="min-w-[260px] snap-start scroll-ml-4 flex-shrink-0 transition-transform hover:-translate-y-2 duration-300"
+              >
                 <ShoppingProductTile
-                  key={productItem._id || index}
                   handleGetProductDetails={handleGetProductDetails}
                   product={productItem}
                   handleAddtoCart={handleAddtoCart}
                 />
-              ))}
-          </div>
-          {visibleCount < productList.length && (
-            <div className="text-center mt-6">
-              <button
-                onClick={() => setVisibleCount((prev) => prev + 20)}
-                className="bg-purple-600 text-white px-6 py-2 rounded hover:bg-purple-700 transition"
-              >
-                Show More
-              </button>
-            </div>
-          )}
+              </div>
+          ))}
+
         </div>
-      </section>
+
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => document.getElementById("feature-scroll").scrollBy({ left: 300, behavior: 'smooth' })}
+          className="absolute z-10 right-0 top-1/2 transform -translate-y-1/2 bg-white shadow-md hover:bg-purple-100 transition hidden group-hover:flex"
+        >
+          <ChevronRightIcon className="w-5 h-5 text-purple-800" />
+        </Button>
+      </div>
+    </div>
+  </div>
+</section>
+
 
       <ProductDetailsDialog
         open={openDetailsDialog}
