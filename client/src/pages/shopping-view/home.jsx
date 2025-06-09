@@ -27,7 +27,7 @@ import { addToCart, fetchCartItems } from "@/store/shop/cart-slice";
 import { useToast } from "@/components/ui/use-toast";
 import ProductDetailsDialog from "@/components/shopping-view/product-details";
 import { getFeatureImages } from "@/store/common-slice";
-import FinStoreLogo from "../../assets/finstore_logo.png";
+// import FinStoreLogo from "../../assets/finstore_logo.png";
 
 const categoriesWithIcon = [
   { id: "men", label: "Men", icon: ShirtIcon },
@@ -286,7 +286,7 @@ function ShoppingHome() {
         </Button>
       </div>
     </div>
-  </div>
+  </div>  
 </section>
 
 

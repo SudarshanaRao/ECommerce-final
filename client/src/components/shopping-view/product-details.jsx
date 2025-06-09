@@ -275,61 +275,43 @@ useEffect(() => {
           </div>
 
           {(() => {
-            const category = productDetails?.category?.toLowerCase();
+  const category = productDetails?.category?.toLowerCase();
 
-            if (["men", "women"].includes(category)) {
-              return (
-                <div className="mb-4">
-                  <Label className="mb-2 block text-sm font-semibold">Select Size:</Label>
-                  <div className="flex gap-2">
-                    {["S", "M", "L", "XL"].map((size) => {
-                      const stock = productDetails.sizes?.[size]?.stock ?? 0;
-                      const isOutOfStock = stock === 0;
+  if (["men", "women"].includes(category)) {
+    return (
+      <div className="mb-4">
+        <Label className="mb-2 block text-sm font-semibold">Select Size:</Label>
+        <div className="flex gap-2">
+          {["S", "M", "L", "XL"].map((size) => {
+            const stock = productDetails.sizes?.[size]?.stock ?? 0;
+            const isOutOfStock = stock === 0;
 
-                      return (
-                        <Button
-                          key={size}
-                          variant={selectedSize === size ? "default" : "outline"}
-                          onClick={() => {
-                            if (isOutOfStock) return;
-                            setSelectedSize(size);
-                            const sizeInfo = productDetails.sizes?.[size];
-                            setSelectedPrice(sizeInfo?.price ?? null);
-                            setSelectedSalePrice(sizeInfo?.salePrice ?? null);
-                          }}
-                          disabled={isOutOfStock}
-                          className={isOutOfStock ? "out-of-stock" : ""}
-                        >
-                          {size}
-                        </Button>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            } else if (category === "skincare") {
-              const skincareSizes = ["10ml", "30ml", "100ml", "500ml"];
-              return (
-                <div className="mb-4">
-                  <Label className="mb-2 block text-sm font-semibold">Select Size:</Label>
-                  <div className="flex gap-2">
-                    {skincareSizes.map((size) => (
-                      <Button
-                        key={size}
-                        variant={selectedSize === size ? "default" : "outline"}
-                        onClick={() => setSelectedSize(size)}
-                        className={`rounded-full px-4 py-2 text-sm font-semibold ${
-                          selectedSize === size ? "bg-purple-600 text-white" : "hover:bg-purple-100"
-                        }`}
-                      >
-                        {size}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-              );
-            } return null;
-          })()}
+            return (
+              <Button
+                key={size}
+                variant={selectedSize === size ? "default" : "outline"}
+                onClick={() => {
+                  if (isOutOfStock) return;
+                  setSelectedSize(size);
+                  const sizeInfo = productDetails.sizes?.[size];
+                  setSelectedPrice(sizeInfo?.price ?? null);
+                  setSelectedSalePrice(sizeInfo?.salePrice ?? null);
+                }}
+                disabled={isOutOfStock}
+                className={isOutOfStock ? "out-of-stock" : ""}
+              >
+                {size}
+              </Button>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+})()}
+
 
           <div className="flex items-center justify-between mt-4">
             {selectedSalePrice ? (
@@ -351,25 +333,43 @@ useEffect(() => {
           </div>
 
           <div className="mt-5 mb-5">
-            {(productDetails?.sizes?.[selectedSize || "Free Size"]?.stock || 0) === 0 ? (
-              <Button className="w-full opacity-60 cursor-not-allowed" disabled>
-                Out of Stock
-              </Button>
+            {(() => {
+  const category = productDetails?.category?.toLowerCase();
+  const isClothing = ["men", "women"].includes(category);
+  const isGeneralStock = ["accessories", "footwear", "skincare"].includes(category);
 
-            ) : (
-              <Button
-                className="w-full"
-                onClick={() =>
-                  handleAddToCart(
-                    productDetails?._id,
-                    productDetails?.sizes?.[selectedSize || "Free Size"]?.stock || 0
-                  )
+  let stock = 0;
 
-                }
-              >
-                Add to Cart
-              </Button>
-            )}
+  if (isClothing) {
+    const size = selectedSize || "Free Size";
+    stock = productDetails?.sizes?.[size]?.stock ?? 0;
+  } else if (isGeneralStock) {
+    stock = productDetails?.totalStock ?? 0;
+  }
+
+  if (stock === 0) {
+    return (
+      <Button className="w-full opacity-60 cursor-not-allowed" disabled>
+        Out of Stock
+      </Button>
+    );
+  }
+
+  return (
+    <Button
+      className="w-full"
+      onClick={() =>
+        handleAddToCart(
+          productDetails?._id,
+          stock
+        )
+      }
+    >
+      Add to Cart
+    </Button>
+  );
+})()}
+
 
             <Button
               onClick={toggleWishlist}

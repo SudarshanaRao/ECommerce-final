@@ -1,110 +1,242 @@
-import { Card, CardContent, CardFooter } from "../ui/card";
+import React, { useState, useEffect } from "react";
+import { Heart, HeartOff } from "lucide-react";
 import { Button } from "../ui/button";
-import { brandOptionsMap, categoryOptionsMap } from "@/config";
-import { Badge } from "../ui/badge";
-import { cn } from "@/lib/utils"; // assuming you use classnames utility
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart, fetchCartItems } from "@/store/shop/cart-slice";
+import { useToast } from "../ui/use-toast";
+import { addWishlistItem, removeWishlistItem } from "@/utils/wishlist-utils";
 
-function ShoppingProductTile({
-  product,
-  handleGetProductDetails,
-  handleAddtoCart,
-}) {
-  const isFashionCategory = product?.category === "men" || product?.category === "women";
+function ShoppingProductTile({ product }) {
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+  const { cartItems } = useSelector((state) => state.shopCart);
+  const { toast } = useToast();
 
-let originalPrice = product?.price;
-let salePrice = product?.salePrice;
-let finalPrice = salePrice > 0 ? salePrice : originalPrice;
+  const [selectedSize, setSelectedSize] = useState("");
+  const [selectedPrice, setSelectedPrice] = useState(product.price);
+  const [selectedSalePrice, setSelectedSalePrice] = useState(product.salePrice || null);
+  const [isWishlisted, setIsWishlisted] = useState(false);
 
-if (isFashionCategory && product?.sizes) {
-  const entries = Object.entries(product.sizes)
-    .filter(([_, info]) => info?.price)
-    .map(([_, info]) => {
-      const hasValidSale = info.salePrice && info.salePrice > 0;
-      const final = hasValidSale ? info.salePrice : info.price;
-      return {
-        price: info.price,
-        salePrice: hasValidSale ? info.salePrice : null,
-        finalPrice: final,
-      };
-    });
+  useEffect(() => {
+    if (!product?._id) return;
+    try {
+      const wishlist = JSON.parse(localStorage.getItem("wishlist_items") || "[]");
+      const exists = wishlist.some((item) => item.productId === product._id);
+      setIsWishlisted(exists);
+    } catch (err) {
+      console.error("Failed to parse wishlist:", err);
+      setIsWishlisted(false);
+    }
+  }, [product?._id]);
 
-  if (entries.length > 0) {
-    const min = entries.reduce((min, curr) =>
-      curr.finalPrice < min.finalPrice ? curr : min
+  // On product or sizes change, set default selected size and price
+  useEffect(() => {
+    if (!product?.sizes) return;
+
+    const sizeEntries = Object.entries(product.sizes);
+
+    const sizeWithPrices = sizeEntries
+      .filter(([_, info]) => info && (info.salePrice || info.price || info.salePrice === 0))
+      .map(([size, info]) => {
+        const hasValidSale = info.salePrice && info.salePrice > 0;
+        const finalPrice = hasValidSale ? info.salePrice : info.price;
+
+        return {
+          size,
+          price: info.price,
+          salePrice: hasValidSale ? info.salePrice : null,
+          finalPrice,
+        };
+      });
+
+    if (sizeWithPrices.length > 0) {
+      const sorted = sizeWithPrices.sort((a, b) => a.finalPrice - b.finalPrice);
+      const defaultSize = sorted[0];
+      setSelectedSize(defaultSize.size);
+      setSelectedPrice(defaultSize.price);
+      setSelectedSalePrice(defaultSize.salePrice);
+    } else {
+      // No sizes, fallback to product price
+      setSelectedPrice(product.price);
+      setSelectedSalePrice(product.salePrice || null);
+      setSelectedSize("");
+    }
+  }, [product]);
+
+  function handleAddToCart(productId) {
+    if (!productId) return;
+
+    const category = product?.category?.toLowerCase();
+    const requiresSize = ["men", "women", "footwear"].includes(category);
+
+    if (requiresSize && !selectedSize) {
+      toast({
+        title: "Please select a size before adding to cart.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Extract size-specific details
+    const sizeDetails = requiresSize ? product?.sizes?.[selectedSize] : null;
+
+    const price = sizeDetails?.price ?? product?.price ?? 0;
+    const salePrice = sizeDetails?.salePrice ?? product?.salePrice ?? 0;
+    const availableQuantity = sizeDetails?.stock ?? product?.totalStock ?? 0;
+
+    const currentCartItems = cartItems?.items || [];
+    const existingItem = currentCartItems.find(
+      (item) =>
+        item.productId === productId &&
+        (!requiresSize || item.size === selectedSize)
     );
-    originalPrice = min.price;
-    salePrice = min.salePrice;
-    finalPrice = min.finalPrice;
+
+    if (existingItem && existingItem.quantity + 1 > availableQuantity) {
+      toast({
+        title: `Only ${availableQuantity} in stock${requiresSize ? ` for size ${selectedSize}` : ""}`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const payload = {
+      userId: user?.id,
+      productId,
+      quantity: 1,
+      price,
+      salePrice,
+      ...(requiresSize && { size: selectedSize }),
+    };
+
+    dispatch(addToCart(payload)).then((data) => {
+      if (data?.payload?.success) {
+        dispatch(fetchCartItems(user?.id));
+        toast({ title: "Product added to cart" });
+      }
+    });
   }
-}
+
+  const toggleWishlist = () => {
+    if (!product?._id) return;
+    if (isWishlisted) {
+      removeWishlistItem(product._id);
+      toast({ description: "Removed from wishlist" });
+    } else {
+      addWishlistItem({ productId: product._id, ...product });
+      toast({ description: "Added to wishlist" });
+    }
+    setIsWishlisted(!isWishlisted);
+  };
+
+  const discountPercent = selectedPrice && selectedSalePrice
+    ? Math.round(((selectedPrice - selectedSalePrice) / selectedPrice) * 100)
+    : null;
+
+  // Calculate stock for display (simple fallback)
+  const stock = (() => {
+    const category = product?.category?.toLowerCase();
+    if (["men", "women", "footwear"].includes(category)) {
+      return product?.sizes?.[selectedSize]?.stock ?? 0;
+    }
+    return product?.totalStock ?? 0;
+  })();
 
 
   return (
-    <Card
-      className={cn(
-        "w-full max-w-sm mx-auto overflow-hidden shadow-xl transition-transform duration-300 hover:scale-105 animate-fadeIn"
-      )}
+    <div
+      className="relative border rounded-lg p-4 shadow-lg flex flex-col gap-4 max-w-xs
+        bg-white hover:shadow-2xl transition-shadow duration-300 ease-in-out
+        min-h-[420px]"
     >
-      <div onClick={() => handleGetProductDetails(product?._id)} className="cursor-pointer">
-        <div className="relative group">
-          <img
-            src={product?.image}
-            alt={product?.title}
-            className="w-full h-[300px] object-cover rounded-t-lg transition-transform duration-500 group-hover:scale-110"
-          />
-          {product?.totalStock === 0 ? (
-            <Badge className="absolute top-2 left-2 bg-red-600 text-white hover:bg-red-700">
-              Out Of Stock
-            </Badge>
-          ) : product?.totalStock < 5 ? (
-            <Badge className="absolute top-2 left-2 bg-orange-600 text-white hover:bg-orange-700">
-              {`Few items remaining!`}
-            </Badge>
-          ) : product?.totalStock < 10 ? (
-            <Badge className="absolute top-2 left-2 bg-fuchsia-600 text-white hover:bg-fuchsia-700">
-              {`Hurry, selling fast!`}
-            </Badge>
-          ) : product?.salePrice > 0 ? (
-            <Badge className="absolute top-2 left-2 bg-indigo-600 text-white hover:bg-indigo-700">
-              Sale
-            </Badge>
-          ) : null}
-        </div>
-        <CardContent className="p-4 bg-gradient-to-br from-purple-100 via-pink-100 to-indigo-100 rounded-b-lg">
-          <h2 className="text-xl font-bold text-indigo-900 mb-2">{product?.title}</h2>
-          <div className="flex justify-between items-center text-sm text-gray-600 mb-1">
-            <span>{categoryOptionsMap[product?.category]}</span>
-            <span>{brandOptionsMap[product?.brand]}</span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span
-              className={`${
-                salePrice ? "line-through text-gray-400" : "text-indigo-700"
-              } font-semibold`}
-            >
-              ₹{originalPrice}
-            </span>
-            {salePrice > 0 && (
-              <span className="text-pink-600 font-bold">₹{salePrice}</span>
-            )}
-          </div>
-        </CardContent>
+      {/* Discount Badge */}
+      {discountPercent && (
+        <span className="absolute top-3 right-3 bg-red-600 text-white text-xs font-semibold px-3 py-1 rounded-full z-10 shadow-lg">
+          {discountPercent}% OFF
+        </span>
+      )}
+
+      {/* Product Image */}
+      <div className="flex justify-center items-center h-48 overflow-hidden rounded-md bg-gray-50">
+        <img
+          src={product.image}
+          alt={product.title}
+          className="max-h-full object-contain transition-transform duration-300 hover:scale-105"
+          loading="lazy"
+        />
       </div>
-      <CardFooter className="p-4 bg-white">
-        {product?.totalStock === 0 ? (
-          <Button disabled className="w-full opacity-60 cursor-not-allowed">
-            Out Of Stock
-          </Button>
+
+      {/* Title */}
+      <h2 className="text-lg font-semibold text-gray-900 truncate" title={product.title}>
+        {product.title}
+      </h2>
+
+      {/* Size Selection */}
+      {product?.sizes && ["men", "women", "footwear"].includes(product.category?.toLowerCase()) && (
+        <div className="flex gap-3 mt-1 flex-wrap">
+          {["S", "M", "L", "XL"].map((size) => {
+            const stockForSize = product.sizes?.[size]?.stock ?? 0;
+            const isOutOfStock = stockForSize === 0;
+
+            return (
+              <Button
+                key={size}
+                variant={selectedSize === size ? "default" : "outline"}
+                onClick={() => {
+                  if (isOutOfStock) return;
+                  setSelectedSize(size);
+                  const sizeInfo = product.sizes?.[size];
+                  setSelectedPrice(sizeInfo?.price ?? null);
+                  setSelectedSalePrice(sizeInfo?.salePrice ?? null);
+                }}
+                disabled={isOutOfStock}
+                className={`min-w-[40px] px-2 py-1 rounded-md text-sm
+                  ${isOutOfStock ? "opacity-40 cursor-not-allowed" : ""}`}
+              >
+                {size}
+              </Button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Price */}
+      <div className="flex items-center gap-2 mt-2">
+        {selectedSalePrice ? (
+          <>
+            <p className="text-xl font-bold line-through text-gray-400">
+              ₹{selectedPrice}
+            </p>
+            <p className="text-xl font-extrabold text-green-600">
+              ₹{selectedSalePrice}
+            </p>
+          </>
         ) : (
-          <Button
-            onClick={() => handleAddtoCart(product?._id, product?.totalStock)}
-            className="w-full bg-gradient-to-r from-fuchsia-500 to-indigo-600 hover:from-indigo-600 hover:to-fuchsia-500 text-white shadow-lg hover:shadow-fuchsia-500/50 transition-all duration-300"
-          >
-            Add to Cart
-          </Button>
+          <p className="text-xl font-extrabold text-gray-900">₹{selectedPrice}</p>
         )}
-      </CardFooter>
-    </Card>
+      </div>
+
+      {/* Stock & Actions */}
+      <div className="flex gap-3 mt-auto">
+        <Button
+          className="flex-1"
+          onClick={() => handleAddToCart(product._id)}
+          disabled={stock === 0}
+          title={stock === 0 ? "Out of Stock" : "Add to Cart"}
+        >
+          {stock === 0 ? "Out of Stock" : "Add to Cart"}
+        </Button>
+
+        <Button
+          variant={isWishlisted ? "secondary" : "outline"}
+          onClick={toggleWishlist}
+          className="flex items-center gap-2 p-2"
+          title={isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
+          aria-label={isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
+        >
+          {isWishlisted ? <HeartOff className="w-5 h-5 text-red-600" /> : <Heart className="w-5 h-5 text-gray-600" />}
+        </Button>
+      </div>
+    </div>
   );
 }
 
